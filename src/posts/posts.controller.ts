@@ -27,7 +27,7 @@ export class PostsController {
       title: '뉴진스 민지',
       content: '메이크업 고치고 있는 민지',
       likeCount: 1000000,
-      commentCount: 999999999,
+      commentCount: 9999999999,
     };
   }
 }
