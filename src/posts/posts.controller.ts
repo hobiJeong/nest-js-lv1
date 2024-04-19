@@ -20,7 +20,7 @@ interface Post {
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
-  @Get('posts')
+  @Get()
   getPost(): Post {
     return {
       author: 'newjeans_official',
