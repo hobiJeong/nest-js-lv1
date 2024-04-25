@@ -12,7 +12,7 @@ export interface PostModel {
   commentCount: number;
 }
 
-let posts: PostModel[] = [
+const posts: PostModel[] = [
   {
     id: 1,
     author: 'newjeans_official',
@@ -120,14 +120,18 @@ export class PostsService {
     return newPost;
   }
 
-  deletePost(postId: number) {
-    const post = posts.find((post) => post.id === postId);
+  async deletePost(postId: number) {
+    const post = await this.postsRepository.findOne({
+      where: {
+        id: postId,
+      },
+    });
 
     if (!post) {
       throw new NotFoundException();
     }
 
-    posts = posts.filter((post) => post.id !== postId);
+    await this.postsRepository.delete(postId);
 
     return postId;
   }
