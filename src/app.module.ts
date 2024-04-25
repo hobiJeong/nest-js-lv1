@@ -8,6 +8,11 @@ import { PostsModel } from 'src/posts/entities/posts.entity';
 
 dotenv.config();
 
+/**
+ * TypeOrmModule.forRoot --> 루트 모듈에서 import할 때 사용.
+ * 연결 설정같은 것들을 forRoot 메서드의 인수로 넘김
+ * DynamicModule임.
+ */
 @Module({
   imports: [
     PostsModule,
