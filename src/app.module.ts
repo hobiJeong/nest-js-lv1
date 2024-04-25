@@ -5,6 +5,8 @@ import { PostsModule } from 'src/posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 import { PostsModel } from 'src/posts/entities/posts.entity';
+import { UsersModule } from './users/users.module';
+import { UsersModel } from 'src/users/entities/users.entity';
 
 dotenv.config();
 
@@ -23,10 +25,11 @@ dotenv.config();
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [PostsModel],
+      entities: [PostsModel, UsersModel],
       synchronize: true,
       logging: true,
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
