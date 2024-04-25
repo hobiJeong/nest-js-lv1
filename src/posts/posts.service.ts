@@ -51,11 +51,17 @@ export class PostsService {
   }
 
   async getPostById(id: number) {
-    return this.postsRepository.findOne({
+    const post = await this.postsRepository.findOne({
       where: {
         id,
       },
     });
+
+    if (!post) {
+      throw new NotFoundException();
+    }
+
+    return post;
   }
 
   createPost(author: string, title: string, content: string) {
