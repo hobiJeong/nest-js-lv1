@@ -7,6 +7,7 @@ import * as dotenv from 'dotenv';
 import { PostsModel } from 'src/posts/entities/posts.entity';
 import { UsersModule } from './users/users.module';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { AuthModule } from './auth/auth.module';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ dotenv.config();
       logging: true,
     }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
