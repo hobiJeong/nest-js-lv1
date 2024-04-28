@@ -16,4 +16,6 @@
     - int로 변형 및 검증
 - ParseFloatPipe
     - float로 변형 및 검증
+- DefaultValuePipe
+    - 기본 값을 정해주는 pipe. 값이 안들어와도 됨.
 - 그 외 공식문서 참조...
