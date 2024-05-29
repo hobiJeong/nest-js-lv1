@@ -25,4 +25,4 @@ services:
       POSTGRES_PASSWORD: postgres
       # 기본으로 사용할 db의 이름
       POSGRES_DB: postgres
-# 실행하면 postgres-data 폴더에 실제 이미지 속의 data폴더에 존재하는 파일들이 생김
+      # 실행하면 postgres-data 폴더에 실제 이미지 속의 data폴더에 존재하는 파일들이 생김
