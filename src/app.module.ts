@@ -8,6 +8,7 @@ import { PostsModel } from 'src/posts/entities/posts.entity';
 import { UsersModule } from './users/users.module';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { AuthModule } from './auth/auth.module';
+import { CommonModule } from './common/common.module';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ dotenv.config();
     }),
     UsersModule,
     AuthModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
