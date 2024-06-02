@@ -39,7 +39,7 @@ export class AuthController {
     // email:password -> base64
     const token = this.authService.extractTokenFormHeader(rawToken, false);
 
-    const credentials = this.authService.decodeToken(token);
+    const credentials = this.authService.decodeBasicToken(token);
 
     return this.authService.loginWithEmail({
       email: credentials.email,

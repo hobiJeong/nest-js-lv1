@@ -63,7 +63,7 @@ export class AuthService {
    * 2) email:password -> [email, password]
    * 3) {email: email, password: password}
    */
-  decodeToken(base64String: string) {
+  decodeBasicToken(base64String: string) {
     const decoded = Buffer.from(base64String, 'base64').toString('utf8');
 
     const split = decoded.split(':');
