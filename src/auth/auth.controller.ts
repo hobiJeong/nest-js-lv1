@@ -22,7 +22,6 @@ export class AuthController {
   }
 
   @Post('token/refresh')
-  @UseGuards(BasicTokenGuard)
   postTokenRefresh(@Headers('authorization') rawToken: string) {
     const token = this.authService.extractTokenFormHeader(rawToken, true);
 
@@ -37,6 +36,7 @@ export class AuthController {
   }
 
   @Post('login/email')
+  @UseGuards(BasicTokenGuard)
   postLoginEmail(@Headers('authorization') rawToken: string) {
     // email:password -> base64
     const token = this.authService.extractTokenFormHeader(rawToken, false);
