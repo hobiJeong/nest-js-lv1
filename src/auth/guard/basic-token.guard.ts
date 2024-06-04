@@ -26,8 +26,6 @@ export class BasicTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
 
-    // {authorization: 'Basic token'}
-    // token
     const rawToken = req.headers['authorization'];
 
     if (!rawToken) {
