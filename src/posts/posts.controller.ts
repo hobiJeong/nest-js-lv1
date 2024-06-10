@@ -5,14 +5,15 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
+import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 
 /**
  * author: string;
@@ -51,15 +52,11 @@ export class PostsController {
     return this.postsService.createPost(userId, body);
   }
 
-  // 4) PUT /posts/:id
+  // 4) PATCH /posts/:id
   //    id에 해당하는 POST를 변경한다.
-  @Put(':id')
-  putPost(
-    @Param('id', ParseIntPipe) id: number,
-    @Body('title') title?: string,
-    @Body('content') content?: string,
-  ) {
-    return this.postsService.updatePost(id, title, content);
+  @Patch(':id')
+  putPost(@Param('id', ParseIntPipe) id: number, @Body() body: UpdatePostDto) {
+    return this.postsService.updatePost(id, body);
   }
 
   // 5) DELETE /posts/:id
