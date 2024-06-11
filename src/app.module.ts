@@ -10,6 +10,14 @@ import { UsersModel } from 'src/users/entities/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
+import {
+  ENV_DB_DATABASE_KEY,
+  ENV_DB_HOST_KEY,
+  ENV_DB_PASSWORD_KEY,
+  ENV_DB_PORT_KEY,
+  ENV_DB_USERNAME_KEY,
+} from 'src/common/const/env-keys.const';
 
 dotenv.config();
 
@@ -21,13 +29,17 @@ dotenv.config();
 @Module({
   imports: [
     PostsModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: +process.env.DB_PORT,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      host: process.env[ENV_DB_HOST_KEY],
+      port: +process.env[ENV_DB_PORT_KEY],
+      username: process.env[ENV_DB_USERNAME_KEY],
+      password: process.env[ENV_DB_PASSWORD_KEY],
+      database: process.env[ENV_DB_DATABASE_KEY],
       entities: [PostsModel, UsersModel],
       synchronize: true,
       logging: true,
