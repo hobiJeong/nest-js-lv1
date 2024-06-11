@@ -2,15 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
-import {
-  ENV_HOST_KEY,
-  ENV_PROTOCOL_KEY,
-} from 'src/common/const/env-keys.const';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 import { PostsModel } from 'src/posts/entities/posts.entity';
-import { FindOptionsWhere, LessThan, MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PostsService {
@@ -67,7 +63,7 @@ export class PostsService {
     return post;
   }
 
-  async createPost(authorId: number, postDto: CreatePostDto) {
+  async createPost(authorId: number, postDto: CreatePostDto, image?: string) {
     /**
      * 1) create -> 저장할 객체를 생성한다
      * 2) save -> 객체를 저장한다. (create 메서드에서 생성한 객체로)
@@ -77,6 +73,7 @@ export class PostsService {
         id: authorId,
       },
       ...postDto,
+      image,
       likeCount: 0,
       commentCount: 0,
     });
