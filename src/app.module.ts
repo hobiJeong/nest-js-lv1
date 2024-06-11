@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from 'src/posts/posts.module';
@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 dotenv.config();
 
@@ -36,6 +37,12 @@ dotenv.config();
     CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+  ],
 })
 export class AppModule {}
