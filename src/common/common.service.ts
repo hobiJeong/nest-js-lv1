@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { PROTOCOL, HOST } from 'src/common/const/env.const';
 import { FILTER_MAPPER } from 'src/common/const/filter-mapper.const';
 import { BasePaginationDto } from 'src/common/dto/base-pagination.dto';
 import { BaseModel } from 'src/common/entity/base.entity';
@@ -41,6 +42,58 @@ export class CommonService {
      *
      * where__title__ilike
      */
+    const findOptions = this.composeFindOptions<T>(dto);
+
+    const results = await repository.find({
+      ...findOptions,
+      ...overrideFindOptions,
+    });
+
+    const lastItem =
+      results.length > 0 && results.length === dto.take
+        ? results[results.length - 1]
+        : null;
+
+    const nextUrl = lastItem && new URL(`${PROTOCOL}://${HOST}/${path}`);
+
+    if (nextUrl) {
+      /**
+       * dto의 키값들을 루핑하면서
+       * 키값에 해당되는 벨류가 존재한다면
+       * param에 그대로 붙여 넣는다.
+       *
+       * 단, where__id_more_than 값만 lastItem의 마지막 값으로 넣어준다.
+       */
+      for (const key of Object.keys(dto)) {
+        if (dto[key]) {
+          if (
+            key !== 'where__id__more_than' &&
+            key !== 'where__id__less_than'
+          ) {
+            nextUrl.searchParams.append(key, dto[key]);
+          }
+        }
+      }
+
+      let key = null;
+
+      if (dto.order__createdAt === 'ASC') {
+        key = 'where__id__more_than';
+      } else {
+        key = 'where__id__less_than';
+      }
+
+      nextUrl.searchParams.append(key, lastItem.id.toString());
+    }
+
+    return {
+      data: results,
+      cursor: {
+        after: lastItem?.id ?? null,
+      },
+      count: results.length,
+      next: nextUrl?.toString() ?? null,
+    };
   }
 
   private composeFindOptions<T extends BaseModel>(
@@ -91,7 +144,7 @@ export class CommonService {
       } else if (key.startsWith('order__')) {
         order = {
           ...order,
-          ...this.parseOrderFilter(key, value),
+          ...this.parseWhereFilter(key, value),
         };
       }
     }
@@ -107,7 +160,7 @@ export class CommonService {
   private parseWhereFilter<T extends BaseModel>(
     key: string,
     value: any,
-  ): FindOptionsWhere<T> {
+  ): FindOptionsWhere<T> | FindOptionsOrder<T> {
     const options: FindOptionsWhere<T> = {};
 
     /**
@@ -139,6 +192,7 @@ export class CommonService {
      */
     if (split.length === 2) {
       // ['where', 'id']
+      // eslint-disable-next-line no-unused-vars
       const [_, field] = split;
 
       /**
@@ -163,6 +217,7 @@ export class CommonService {
        * 값에 적용 해준다.
        */
       // ['where', 'id', 'more_than']
+      // eslint-disable-next-line no-unused-vars
       const [_, field, operator] = split as [
         string,
         string,
@@ -185,9 +240,4 @@ export class CommonService {
 
     return options;
   }
-
-  private parseOrderFilter<T extends BaseModel>(
-    key: string,
-    value: any,
-  ): FindOptionsOrder<T> {}
 }
