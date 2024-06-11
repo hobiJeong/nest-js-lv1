@@ -18,6 +18,8 @@ import {
   ENV_DB_PORT_KEY,
   ENV_DB_USERNAME_KEY,
 } from 'src/common/const/env-keys.const';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { PUBLIC_FOLDER_PATH } from 'src/common/const/path.const';
 
 dotenv.config();
 
@@ -29,6 +31,21 @@ dotenv.config();
 @Module({
   imports: [
     PostsModule,
+    ServeStaticModule.forRoot({
+      // 4022.jpg
+      // 파일이 업로드 되는 rootPath
+      // 근데 이렇게만 했을 때에는 요청을
+      // http://localhost:3000/public/posts/4022.jpg
+      // 이 아닌
+      // http://localhost:3000/posts/4022.jpg
+      // 로 요청을 해야 serve 받을 수 있음
+      rootPath: PUBLIC_FOLDER_PATH,
+      // 하지만 /posts의 경우엔 이미 GET 요청의 엔드포인트와 겹침
+      // 해당 option을 정의 해줌으로써
+      // public이라는 prefix를 만들어 줄 수 있음.
+      // http://localhost:3000/public/posts/4022.jpg
+      serveRoot: '/public',
+    }),
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
