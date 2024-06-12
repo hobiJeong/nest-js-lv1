@@ -65,8 +65,10 @@ export class PostsService {
     // }
   }
 
-  async getPostById(id: number) {
-    const post = await this.postsRepository.findOne({
+  async getPostById(id: number, qr?: QueryRunner) {
+    const repository = this.getRepository(qr);
+
+    const post = await repository.findOne({
       ...DEFAULT_POST_FIND_OPTIONS,
       where: {
         id,
@@ -93,7 +95,7 @@ export class PostsService {
      */
     const repository = this.getRepository(qr);
 
-    const post = this.postsRepository.create({
+    const post = repository.create({
       author: {
         id: authorId,
       },
@@ -103,7 +105,7 @@ export class PostsService {
       commentCount: 0,
     });
 
-    await this.postsRepository.save(post);
+    await repository.save(post);
 
     return post;
   }

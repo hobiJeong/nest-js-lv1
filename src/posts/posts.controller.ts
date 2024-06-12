@@ -3,12 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Query,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,9 +20,12 @@ import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UsersModel } from 'src/users/entities/users.entity';
 import { ImageModelType } from 'src/common/entity/image.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, QueryRunner } from 'typeorm';
 import { PostsImagesService } from 'src/posts/image/images.service';
 import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { QR } from 'src/common/decorator/query-runner.decorator';
+import { HttpExceptionFilter } from 'src/common/exception-filter/http.exception-filter';
 
 /**
  * author: string;
@@ -42,8 +45,9 @@ export class PostsController {
 
   // 1) GET /posts
   //     모든 post를 다 가져온다
-  @UseInterceptors(LogInterceptor)
   @Get()
+  @UseInterceptors(LogInterceptor)
+  @UseFilters(HttpExceptionFilter)
   getPosts(@Query() query: PaginatePostDto) {
     // return this.postsService.getAllPosts();
     return this.postsService.paginatePosts(query);
@@ -76,39 +80,27 @@ export class PostsController {
   // rollback -> 원상복구
   @Post()
   @UseGuards(AccessTokenGuard)
-  async postPosts(@User('id') userId: number, @Body() body: CreatePostDto) {
-    // 트랜잭션과 관련된 모든 쿼리를 담당할
-    // 쿼리 러너를 생성한다.
+  @UseInterceptors(TransactionInterceptor)
+  async postPosts(
+    @User('id') userId: number,
+    @QR() qr: QueryRunner,
+    @Body() body: CreatePostDto,
+  ) {
+    const post = await this.postsService.createPost(userId, body, qr);
 
-    // 로직 실행
-
-    try {
-      const post = await this.postsService.createPost(userId, body, qr);
-
-      for (let i = 0; i < body.images.length; i++) {
-        await this.postsImagesService.createPostImage(
-          {
-            post,
-            order: i,
-            path: body.images[i],
-            type: ImageModelType.POST_IMAGE,
-          },
-          qr,
-        );
-      }
-
-      await qr.commitTransaction();
-      await qr.release();
-
-      return this.postsService.getPostById(post.id);
-    } catch (err) {
-      // 어떤 에러든 에러가 던져지면
-      // 트랜잭션을 종료하고 원래 상태로 되돌린다.
-      await qr.rollbackTransaction();
-      await qr.release();
-
-      throw new InternalServerErrorException('에러가 났습니다.');
+    for (let i = 0; i < body.images.length; i++) {
+      await this.postsImagesService.createPostImage(
+        {
+          post,
+          order: i,
+          path: body.images[i],
+          type: ImageModelType.POST_IMAGE,
+        },
+        qr,
+      );
     }
+
+    return this.postsService.getPostById(post.id, qr);
   }
 
   // POST /posts/random
