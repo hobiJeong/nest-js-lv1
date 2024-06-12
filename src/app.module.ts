@@ -1,4 +1,10 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PostsModule } from 'src/posts/posts.module';
@@ -21,6 +27,7 @@ import {
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from 'src/common/const/path.const';
 import { ImageModel } from 'src/common/entity/image.entity';
+import { LogMiddleware } from 'src/common/middleware/log.middleware';
 
 dotenv.config();
 
@@ -75,4 +82,11 @@ dotenv.config();
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LogMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}
