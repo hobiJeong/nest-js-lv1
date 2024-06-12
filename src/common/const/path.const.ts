@@ -18,7 +18,6 @@ export const POST_IMAGE_PATH = join(PUBLIC_FOLDER_PATH, POSTS_FOLDER_NAME);
 
 // 절대경로 x
 // /public/posts/xxx.jpg
-
 export const POST_PUBLIC_IMAGE_PATH = join(
   PUBLIC_FOLDER_NAME,
   POSTS_FOLDER_NAME,

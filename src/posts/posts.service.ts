@@ -16,21 +16,26 @@ import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 import { PostsModel } from 'src/posts/entities/posts.entity';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
 import { promises } from 'fs';
+import { CreatePostImageDto } from 'src/posts/image/dto/create-image.dto';
+import { ImageModel } from 'src/common/entity/image.entity';
+import { DEFAULT_POST_FIND_OPTIONS } from 'src/posts/const/default-post-find-options.const';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostsModel)
     private readonly postsRepository: Repository<PostsModel>,
+    @InjectRepository(ImageModel)
+    private readonly imageRepository: Repository<ImageModel>,
     private readonly commonService: CommonService,
     private readonly configService: ConfigService,
   ) {}
 
   async getAllPosts() {
     return this.postsRepository.find({
-      relations: ['author'],
+      ...DEFAULT_POST_FIND_OPTIONS,
     });
   }
 
@@ -39,6 +44,7 @@ export class PostsService {
       await this.createPost(userId, {
         title: `임의로 생성된 포스트 제목 ${i}`,
         content: `임의로 생서된 포스트 내용 ${i}`,
+        images: [],
       });
     }
   }
@@ -48,7 +54,7 @@ export class PostsService {
     return this.commonService.paginate(
       dto,
       this.postsRepository,
-      { relations: ['author'] },
+      { ...DEFAULT_POST_FIND_OPTIONS },
       'posts',
     );
 
@@ -61,10 +67,10 @@ export class PostsService {
 
   async getPostById(id: number) {
     const post = await this.postsRepository.findOne({
+      ...DEFAULT_POST_FIND_OPTIONS,
       where: {
         id,
       },
-      relations: ['author'],
     });
 
     if (!post) {
@@ -74,17 +80,25 @@ export class PostsService {
     return post;
   }
 
-  async createPost(authorId: number, postDto: CreatePostDto) {
+  getRepository(qr?: QueryRunner) {
+    return qr
+      ? qr.manager.getRepository<PostsModel>(PostsModel)
+      : this.postsRepository;
+  }
+
+  async createPost(authorId: number, postDto: CreatePostDto, qr?: QueryRunner) {
     /**
      * 1) create -> 저장할 객체를 생성한다
      * 2) save -> 객체를 저장한다. (create 메서드에서 생성한 객체로)
      */
+    const repository = this.getRepository(qr);
+
     const post = this.postsRepository.create({
       author: {
         id: authorId,
       },
       ...postDto,
-
+      images: [],
       likeCount: 0,
       commentCount: 0,
     });
@@ -92,32 +106,6 @@ export class PostsService {
     await this.postsRepository.save(post);
 
     return post;
-  }
-
-  async createPostImage(dto: CreatePostDto) {
-    // dto의 image 이름을 기반으로
-    // 파일의 경로를 생성한다.
-    const tempFilePath = join(TEMP_FOLDER_PATH, dto.image);
-
-    try {
-      // 파일이 존재하는지 확인
-      // 만약에 존재하지 않는다면 에러를 던짐짐
-      await promises.access(tempFilePath);
-    } catch (e) {
-      throw new BadRequestException('존재하지 않는 파일 입니다.');
-    }
-
-    // 파일의 이름만 가져오기
-    // /Users/aaa/bbb/ccc/asdf.jpg => asdf.jpg
-    const fileName = basename(tempFilePath);
-
-    // 새로 이동할 포스트 폴더의 경로 + 이미지 이름
-    // {프로젝트 경로}/public/posts/asdf.jpg
-    const newPath = join(POST_IMAGE_PATH, fileName);
-
-    await promises.rename(tempFilePath, newPath);
-
-    return true;
   }
 
   async updatePost(postId: number, postDto: UpdatePostDto) {
