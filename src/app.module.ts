@@ -28,6 +28,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { PUBLIC_FOLDER_PATH } from 'src/common/const/path.const';
 import { ImageModel } from 'src/common/entity/image.entity';
 import { LogMiddleware } from 'src/common/middleware/log.middleware';
+import { ChatsModule } from './chats/chats.module';
 
 dotenv.config();
 
@@ -72,6 +73,7 @@ dotenv.config();
     UsersModule,
     AuthModule,
     CommonModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [
