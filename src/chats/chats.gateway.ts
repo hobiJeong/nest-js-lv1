@@ -1,3 +1,4 @@
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -35,6 +36,16 @@ export class ChatsGateway implements OnGatewayConnection {
     console.log(`on connect called : ${socket.id}`);
   }
 
+  @UsePipes(
+    new ValidationPipe({
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  )
   @SubscribeMessage('create_chat')
   async createChat(
     @MessageBody() data: CreateChatDto,
@@ -45,7 +56,6 @@ export class ChatsGateway implements OnGatewayConnection {
 
   @SubscribeMessage('enter_chat')
   async enterChat(
-    // 방의 chat ID들을 리스트로 받는다.
     @MessageBody() data: EnterChatDto,
     @ConnectedSocket() socket: Socket,
   ) {
