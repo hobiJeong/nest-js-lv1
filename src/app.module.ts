@@ -29,6 +29,7 @@ import { PUBLIC_FOLDER_PATH } from 'src/common/const/path.const';
 import { ImageModel } from 'src/common/entity/image.entity';
 import { LogMiddleware } from 'src/common/middleware/log.middleware';
 import { ChatsModule } from './chats/chats.module';
+import { ChatsModel } from 'src/chats/entity/chats.entity';
 
 dotenv.config();
 
@@ -66,7 +67,7 @@ dotenv.config();
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel],
+      entities: [PostsModel, UsersModel, ImageModel, ChatsModel],
       synchronize: true,
       logging: true,
     }),
