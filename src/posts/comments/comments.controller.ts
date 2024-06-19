@@ -11,6 +11,9 @@ import {
 import { CommentsService } from './comments.service';
 import { PaginateCommentsDto } from 'src/posts/comments/dto/paginate-comments.dto';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
+import { User } from 'src/users/decorator/user.decorator';
+import { UsersModel } from 'src/users/entity/users.entity';
+import { CreateCommentDto } from 'src/posts/comments/dto/create-comment.dto';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
@@ -32,7 +35,10 @@ export class CommentsController {
   @Post()
   @UseGuards(AccessTokenGuard)
   postComment(
-    @Param('postId', ParseIntPipe) pid: number,
+    @Param('postId', ParseIntPipe) postId: number,
     @Body() body: CreateCommentDto,
-  ) {}
+    @User() user: UsersModel,
+  ) {
+    return this.commentsService.createComment(body, postId, user);
+  }
 }
