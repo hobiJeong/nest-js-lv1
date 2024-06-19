@@ -8,12 +8,15 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
+  OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
 import { SocketBearerTokenGuard } from 'src/auth/guard/socket/socket-bearer-token.guard';
 import { ChatsService } from 'src/chats/chats.service';
 import { CreateChatDto } from 'src/chats/dto/create-chat.dto';
@@ -22,15 +25,20 @@ import { CreateMessagesDto } from 'src/chats/messages/dto/create-messages.dto';
 import { ChatsMessagesService } from 'src/chats/messages/messages.service';
 import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-catch-http.exception-filter';
 import { UsersModel } from 'src/users/entities/users.entity';
+import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
   // ws://localhost:3000/chats
   namespace: 'chats',
 })
-export class ChatsGateway implements OnGatewayConnection {
+export class ChatsGateway
+  implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
+{
   constructor(
     private readonly chatsService: ChatsService,
     private readonly messagesService: ChatsMessagesService,
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
   ) {}
 
   @WebSocketServer()
@@ -40,8 +48,41 @@ export class ChatsGateway implements OnGatewayConnection {
    */
   server: Server;
 
-  handleConnection(socket: Socket) {
+  afterInit(server: any) {
+    console.log('after gateway init');
+  }
+
+  handleDisconnect(socket: Socket) {
+    console.log(`on disconnect called : ${socket.id}`);
+  }
+
+  /**
+   * 연결이 뚫리면 서버와 클라이언트 간의 파이프가 생김.
+   * 같은 클라이언트는 계속 같은 소켓으로 통신을 한다.
+   */
+  async handleConnection(socket: Socket & { user: UsersModel }) {
     console.log(`on connect called : ${socket.id}`);
+
+    const headers = socket.handshake.headers;
+
+    const rawToken = headers['authorization'];
+
+    if (!rawToken) {
+      throw new WsException('토큰이 없습니다!');
+    }
+
+    try {
+      const token = this.authService.extractTokenFormHeader(rawToken, true);
+
+      const payload = this.authService.verifyToken(token);
+      const user = await this.usersService.getUserByEmail(payload.email);
+
+      socket.user = user;
+
+      return true;
+    } catch (err) {
+      throw new WsException('토큰이 유효하지 않습니다.');
+    }
   }
 
   @UsePipes(
@@ -55,7 +96,6 @@ export class ChatsGateway implements OnGatewayConnection {
     }),
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
-  @UseGuards(SocketBearerTokenGuard)
   @SubscribeMessage('create_chat')
   async createChat(
     @MessageBody() data: CreateChatDto,
@@ -75,7 +115,6 @@ export class ChatsGateway implements OnGatewayConnection {
     }),
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
-  @UseGuards(SocketBearerTokenGuard)
   @SubscribeMessage('enter_chat')
   async enterChat(
     @MessageBody() data: EnterChatDto,
@@ -106,7 +145,7 @@ export class ChatsGateway implements OnGatewayConnection {
     }),
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
-  @UseGuards(SocketBearerTokenGuard)
+
   // socket.on('send_message', (message) => { console.log(message) });
   @SubscribeMessage('send_message')
   async sendMessage(
