@@ -32,6 +32,7 @@ import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from 'src/chats/entity/chats.entity';
 import { MessagesModel } from 'src/chats/messages/entity/messages.entity';
 import { CommentsModule } from './posts/comments/comments.module';
+import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 
 dotenv.config();
 
@@ -69,7 +70,14 @@ dotenv.config();
       username: process.env[ENV_DB_USERNAME_KEY],
       password: process.env[ENV_DB_PASSWORD_KEY],
       database: process.env[ENV_DB_DATABASE_KEY],
-      entities: [PostsModel, UsersModel, ImageModel, ChatsModel, MessagesModel],
+      entities: [
+        PostsModel,
+        UsersModel,
+        ImageModel,
+        ChatsModel,
+        MessagesModel,
+        CommentsModel,
+      ],
       synchronize: true,
       logging: true,
     }),
