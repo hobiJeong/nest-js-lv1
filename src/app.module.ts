@@ -15,7 +15,7 @@ import { UsersModule } from './users/users.module';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import {
   ENV_DB_DATABASE_KEY,
@@ -33,6 +33,8 @@ import { ChatsModel } from 'src/chats/entity/chats.entity';
 import { MessagesModel } from 'src/chats/messages/entity/messages.entity';
 import { CommentsModule } from './posts/comments/comments.module';
 import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
+import { RolesGuard } from 'src/users/guard/roles.guard';
+import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 
 dotenv.config();
 
@@ -93,6 +95,14 @@ dotenv.config();
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

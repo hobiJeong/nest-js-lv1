@@ -24,6 +24,9 @@ import { PostsImagesService } from 'src/posts/image/images.service';
 import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { QR } from 'src/common/decorator/query-runner.decorator';
+import { Roles } from 'src/users/decorator/roles.decorator';
+import { RolesEnum } from 'src/users/const/roles.const';
+import { IsPublic } from 'src/common/decorator/is-public.decorator';
 
 /**
  * author: string;
@@ -44,6 +47,7 @@ export class PostsController {
   // 1) GET /posts
   //     모든 post를 다 가져온다
   @Get()
+  @IsPublic()
   @UseInterceptors(LogInterceptor)
   getPosts(@Query() query: PaginatePostDto) {
     // return this.postsService.getAllPosts();
@@ -54,6 +58,7 @@ export class PostsController {
   //    id에 해당하는 post를 가져온다
   //    예를 들어서 id=1일 경우 id가 1인 포스트를 가져온다.
   @Get(':id')
+  @IsPublic()
   getPost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.getPostById(id);
   }
@@ -119,6 +124,8 @@ export class PostsController {
   // 5) DELETE /posts/:id
   //    id에 해당하는 POST를 삭제한다.
   @Delete(':id')
+  @UseGuards(AccessTokenGuard)
+  @Roles(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);
   }
