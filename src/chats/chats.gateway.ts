@@ -24,7 +24,7 @@ import { EnterChatDto } from 'src/chats/dto/enter-chat.dto';
 import { CreateMessagesDto } from 'src/chats/messages/dto/create-messages.dto';
 import { ChatsMessagesService } from 'src/chats/messages/messages.service';
 import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-catch-http.exception-filter';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { UsersModel } from 'src/users/entity/users.entity';
 import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
@@ -60,6 +60,7 @@ export class ChatsGateway
    * 연결이 뚫리면 서버와 클라이언트 간의 파이프가 생김.
    * 같은 클라이언트는 계속 같은 소켓으로 통신을 한다.
    */
+  @UseFilters(SocketCatchHttpExceptionFilter)
   async handleConnection(socket: Socket & { user: UsersModel }) {
     console.log(`on connect called : ${socket.id}`);
 
@@ -68,7 +69,7 @@ export class ChatsGateway
     const rawToken = headers['authorization'];
 
     if (!rawToken) {
-      throw new WsException('토큰이 없습니다!');
+      socket.disconnect();
     }
 
     try {
@@ -80,8 +81,8 @@ export class ChatsGateway
       socket.user = user;
 
       return true;
-    } catch (err) {
-      throw new WsException('토큰이 유효하지 않습니다.');
+    } catch {
+      socket.disconnect();
     }
   }
 

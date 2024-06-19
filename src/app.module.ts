@@ -10,9 +10,9 @@ import { AppService } from './app.service';
 import { PostsModule } from 'src/posts/posts.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
-import { PostsModel } from 'src/posts/entities/posts.entity';
+import { PostsModel } from 'src/posts/entity/posts.entity';
 import { UsersModule } from './users/users.module';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { UsersModel } from 'src/users/entity/users.entity';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -31,6 +31,7 @@ import { LogMiddleware } from 'src/common/middleware/log.middleware';
 import { ChatsModule } from './chats/chats.module';
 import { ChatsModel } from 'src/chats/entity/chats.entity';
 import { MessagesModel } from 'src/chats/messages/entity/messages.entity';
+import { CommentsModule } from './posts/comments/comments.module';
 
 dotenv.config();
 
@@ -76,6 +77,7 @@ dotenv.config();
     AuthModule,
     CommonModule,
     ChatsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [

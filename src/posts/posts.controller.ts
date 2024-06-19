@@ -17,7 +17,7 @@ import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { UsersModel } from 'src/users/entity/users.entity';
 import { ImageModelType } from 'src/common/entity/image.entity';
 import { DataSource, QueryRunner } from 'typeorm';
 import { PostsImagesService } from 'src/posts/image/images.service';

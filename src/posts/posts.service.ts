@@ -15,7 +15,7 @@ import {
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
-import { PostsModel } from 'src/posts/entities/posts.entity';
+import { PostsModel } from 'src/posts/entity/posts.entity';
 import { QueryRunner, Repository } from 'typeorm';
 import { promises } from 'fs';
 import { CreatePostImageDto } from 'src/posts/image/dto/create-image.dto';

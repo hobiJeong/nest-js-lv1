@@ -1,6 +1,6 @@
 import { PickType } from '@nestjs/mapped-types';
 import { IsOptional, IsString } from 'class-validator';
-import { PostsModel } from 'src/posts/entities/posts.entity';
+import { PostsModel } from 'src/posts/entity/posts.entity';
 
 // 상속, implements 등등 여러가지 OOP 테크닉들을 사용가능
 
