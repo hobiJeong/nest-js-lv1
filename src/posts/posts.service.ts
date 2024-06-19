@@ -156,4 +156,8 @@ export class PostsService {
 
     return postId;
   }
+
+  checkPostExistsById(id: number) {
+    return this.postsRepository.existsBy({ id });
+  }
 }
