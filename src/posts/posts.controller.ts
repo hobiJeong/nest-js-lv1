@@ -27,7 +27,8 @@ import { QR } from 'src/common/decorator/query-runner.decorator';
 import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const/roles.const';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
-import { IsPostMineOrAdmin } from 'src/posts/guard/is-post-mine-or-admin.guard';
+import { IsPostMineOrAdmin } from 'src/common/guard/is-post-mine-or-admin.guard';
+import { IsMineOrAdminGuard } from 'src/common/guard/is-mine-or-admin.guard';
 
 /**
  * author: string;
@@ -116,7 +117,7 @@ export class PostsController {
   // 4) PATCH /posts/:id
   //    id에 해당하는 POST를 변경한다.
   @Patch(':postId')
-  @UseGuards(IsPostMineOrAdmin)
+  @UseGuards(IsMineOrAdminGuard)
   patchPost(
     @Param('postId', ParseIntPipe) id: number,
     @Body() body: UpdatePostDto,
