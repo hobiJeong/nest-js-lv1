@@ -35,6 +35,7 @@ import { CommentsModule } from './posts/comments/comments.module';
 import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 import { RolesGuard } from 'src/users/guard/roles.guard';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
+import { UserFollowersModel } from 'src/users/entity/user-followers.entity';
 
 dotenv.config();
 
@@ -79,6 +80,7 @@ dotenv.config();
         ChatsModel,
         MessagesModel,
         CommentsModel,
+        UserFollowersModel,
       ],
       synchronize: true,
       logging: true,
