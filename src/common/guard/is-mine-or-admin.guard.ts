@@ -34,6 +34,13 @@ export class IsMineOrAdminGuard<T extends RequiredMethod>
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if (!this.service.isMine) {
+      console.error(
+        `isMine 메서드가 구현 되어 있지 않거나 서비스의 DI가 실행 되지 않았습니다`,
+      );
+      throw new InternalServerErrorException('서버 에러');
+    }
+
     const req = context.switchToHttp().getRequest() as Request & {
       user: UsersModel;
     };
@@ -52,10 +59,15 @@ export class IsMineOrAdminGuard<T extends RequiredMethod>
       return true;
     }
 
-    const paramsToken = this.reflector.getAllAndOverride(PARAMS_TOKEN, [
+    const paramsToken = this.reflector.getAllAndOverride<string>(PARAMS_TOKEN, [
       context.getClass(),
       context.getHandler(),
     ]);
+
+    if (!paramsToken) {
+      console.error('SetParamsToken과 함께 사용해야 합니다.');
+      throw new InternalServerErrorException('서버 에러');
+    }
 
     const resourceId = req.params[paramsToken];
 
