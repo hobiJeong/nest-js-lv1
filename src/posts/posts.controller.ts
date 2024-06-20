@@ -27,6 +27,7 @@ import { QR } from 'src/common/decorator/query-runner.decorator';
 import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const/roles.const';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import { IsPostMineOrAdmin } from 'src/posts/guard/is-post-mine-or-admin.guard';
 
 /**
  * author: string;
@@ -81,7 +82,6 @@ export class PostsController {
   // commit -> 저장
   // rollback -> 원상복구
   @Post()
-  @UseGuards(AccessTokenGuard)
   @UseInterceptors(TransactionInterceptor)
   async postPosts(
     @User('id') userId: number,
@@ -107,7 +107,6 @@ export class PostsController {
 
   // POST /posts/random
   @Post('random')
-  @UseGuards(AccessTokenGuard)
   async postPostsRandom(@User() user: UsersModel) {
     await this.postsService.generatePosts(user.id);
 
@@ -116,15 +115,18 @@ export class PostsController {
 
   // 4) PATCH /posts/:id
   //    id에 해당하는 POST를 변경한다.
-  @Patch(':id')
-  putPost(@Param('id', ParseIntPipe) id: number, @Body() body: UpdatePostDto) {
+  @Patch(':postId')
+  @UseGuards(IsPostMineOrAdmin)
+  patchPost(
+    @Param('postId', ParseIntPipe) id: number,
+    @Body() body: UpdatePostDto,
+  ) {
     return this.postsService.updatePost(id, body);
   }
 
   // 5) DELETE /posts/:id
   //    id에 해당하는 POST를 삭제한다.
   @Delete(':id')
-  @UseGuards(AccessTokenGuard)
   @Roles(RolesEnum.ADMIN)
   deletePost(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.deletePost(id);

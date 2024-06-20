@@ -21,7 +21,11 @@ import { PostsImagesService } from 'src/posts/image/images.service';
     CommonModule,
   ],
   controllers: [PostsController],
-  providers: [PostsService, PostsImagesService],
+  providers: [
+    PostsService,
+    PostsImagesService,
+    { provide: 'SERVICE_TOKEN', useClass: PostsService },
+  ],
   exports: [PostsService],
 })
 export class PostsModule {}
