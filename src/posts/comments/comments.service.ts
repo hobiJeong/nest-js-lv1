@@ -100,4 +100,15 @@ export class CommentsService {
 
     return id;
   }
+
+  isMine(userId: number, id: number) {
+    return this.commentsRepository.exists({
+      where: {
+        id,
+        author: {
+          id: userId,
+        },
+      },
+    });
+  }
 }

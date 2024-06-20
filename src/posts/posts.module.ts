@@ -9,6 +9,7 @@ import { CommonModule } from 'src/common/common.module';
 
 import { ImageModel } from 'src/common/entity/image.entity';
 import { PostsImagesService } from 'src/posts/image/images.service';
+import { SERVICE_TOKEN } from 'src/common/guard/is-mine-or-admin.guard';
 
 /**
  * TypeORM 모델과 연동이 되는 레포지터리의 모듈을 import 해줘야 주입 가능. --> forFeature
@@ -24,7 +25,7 @@ import { PostsImagesService } from 'src/posts/image/images.service';
   providers: [
     PostsService,
     PostsImagesService,
-    { provide: 'SERVICE_TOKEN', useClass: PostsService },
+    { provide: SERVICE_TOKEN, useClass: PostsService },
   ],
   exports: [PostsService],
 })

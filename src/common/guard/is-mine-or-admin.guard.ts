@@ -14,7 +14,7 @@ import { Request } from 'express';
 import { RolesEnum } from 'src/users/const/roles.const';
 import { UsersModel } from 'src/users/entity/users.entity';
 
-interface RequiredMethod {
+export interface RequiredMethod {
   isMine: (userId: number, id: number) => Promise<boolean>;
 }
 
@@ -52,9 +52,6 @@ export class IsMineOrAdminGuard<T extends RequiredMethod>
       throw new InternalServerErrorException('서버 에러');
     }
 
-    /**
-     * Admin일 경우 그냥 패스
-     */
     if (user.role === RolesEnum.ADMIN) {
       return true;
     }

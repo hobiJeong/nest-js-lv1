@@ -18,6 +18,10 @@ import { UsersModel } from 'src/users/entity/users.entity';
 import { CreateCommentDto } from 'src/posts/comments/dto/create-comment.dto';
 import { UpdateCommentDto } from 'src/posts/comments/dto/update-comment.dto';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import {
+  IsMineOrAdminGuard,
+  SetParamsToken,
+} from 'src/common/guard/is-mine-or-admin.guard';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
@@ -49,6 +53,8 @@ export class CommentsController {
   }
 
   @Patch(':commentId')
+  @SetParamsToken('commentId')
+  @UseGuards(IsMineOrAdminGuard<CommentsService>)
   async patchComment(
     @Param('commentId', ParseIntPipe) commentId: number,
     @Body() body: UpdateCommentDto,
@@ -57,6 +63,8 @@ export class CommentsController {
   }
 
   @Delete(':commentId')
+  @SetParamsToken('commentId')
+  @UseGuards(IsMineOrAdminGuard<CommentsService>)
   async deleteComment(@Param('commentId', ParseIntPipe) commentId: number) {
     return this.commentsService.deleteComment(commentId);
   }

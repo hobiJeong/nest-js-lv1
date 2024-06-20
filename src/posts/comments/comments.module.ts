@@ -8,6 +8,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import { PostsExistsMiddleware } from 'src/posts/comments/middleware/post-exists.middleware';
 import { PostsModule } from 'src/posts/posts.module';
+import { SERVICE_TOKEN } from 'src/common/guard/is-mine-or-admin.guard';
 
 @Module({
   imports: [
@@ -18,7 +19,13 @@ import { PostsModule } from 'src/posts/posts.module';
     PostsModule,
   ],
   controllers: [CommentsController],
-  providers: [CommentsService],
+  providers: [
+    CommentsService,
+    {
+      provide: SERVICE_TOKEN,
+      useClass: CommentsService,
+    },
+  ],
 })
 export class CommentsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
