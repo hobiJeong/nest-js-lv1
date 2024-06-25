@@ -7,120 +7,120 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model chats_model {
-  id                            Int                             @id(map: "PK_2aea6cf9923f6b48da28709c9df") @default(autoincrement())
-  updatedAt                     DateTime                        @default(now()) @db.Timestamp(6)
-  createdAt                     DateTime                        @default(now()) @db.Timestamp(6)
-  messages_model                messages_model[]
-  users_model_chats_chats_model users_model_chats_chats_model[]
+model ChatsModel {
+  id              Int               @id(map: "PK_2aea6cf9923f6b48da28709c9df") @default(autoincrement())
+  updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  messagesModel   MessagesModel[]
+  usersChatsModel UsersChatsModel[]
+
+  @@map("chats_model")
 }
 
-model comments_model {
-  id          Int          @id(map: "PK_0da0a249f71e90b4948e21d4bc4") @default(autoincrement())
-  updatedAt   DateTime     @default(now()) @db.Timestamp(6)
-  createdAt   DateTime     @default(now()) @db.Timestamp(6)
-  comment     String       @db.VarChar
-  likeCount   Int
-  authorId    Int?
-  postId      Int?
-  users_model users_model? @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_26a4df66c84022300d49a4c7c8e")
-  posts_model posts_model? @relation(fields: [postId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_30172445adc82b4acfa72e162ee")
+model CommentsModel {
+  id         Int         @id(map: "PK_0da0a249f71e90b4948e21d4bc4") @default(autoincrement())
+  updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  comment    String      @db.VarChar
+  likeCount  Int         @map("like_count")
+  authorId   Int?        @map("author_id")
+  postId     Int?        @map("post_id")
+  usersModel UsersModel? @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_26a4df66c84022300d49a4c7c8e")
+  postsModel PostsModel? @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_30172445adc82b4acfa72e162ee")
+
+  @@map("comments_model")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model image_model {
-  id          Int          @id(map: "PK_05aa8703890985ec0bb38428699") @default(autoincrement())
-  updatedAt   DateTime     @default(now()) @db.Timestamp(6)
-  createdAt   DateTime     @default(now()) @db.Timestamp(6)
-  order       Int          @default(0)
-  type        Int
-  path        String       @db.VarChar
-  postId      Int?
-  posts_model posts_model? @relation(fields: [postId], references: [id], onDelete: Cascade, map: "FK_40cd89c6655ec7b102842feacab")
+model ImageModel {
+  id         Int         @id(map: "PK_05aa8703890985ec0bb38428699") @default(autoincrement())
+  updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  order      Int         @default(0)
+  type       Int
+  path       String      @db.VarChar
+  postId     Int?        @map("post_id")
+  postsModel PostsModel? @relation(fields: [postId], references: [id], onDelete: Cascade, map: "FK_40cd89c6655ec7b102842feacab")
+
+  @@map("image_model")
 }
 
-model messages_model {
-  id                                                 Int           @id(map: "PK_0f7c1e4adf172209f286cfcae2f") @default(autoincrement())
-  updatedAt                                          DateTime      @default(now()) @db.Timestamp(6)
-  createdAt                                          DateTime      @default(now()) @db.Timestamp(6)
-  message                                            String        @db.VarChar
-  chatId                                             Int?
-  authorId                                           Int?
-  users_model_messages_model_authorIdTousers_model   users_model?  @relation("messages_model_authorIdTousers_model", fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_65a138da666c7f41f44c7c22206")
-  chats_model                                        chats_model?  @relation(fields: [chatId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ea3803c31ed7eccb4aca9416504")
-  users_model_users_model_messagesIdTomessages_model users_model[] @relation("users_model_messagesIdTomessages_model")
+model MessagesModel {
+  id         Int         @id(map: "PK_0f7c1e4adf172209f286cfcae2f") @default(autoincrement())
+  updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  message    String      @db.VarChar
+  chatId     Int?        @map("chat_id")
+  authorId   Int?        @map("author_id")
+  author     UsersModel? @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_65a138da666c7f41f44c7c22206")
+  chatsModel ChatsModel? @relation(fields: [chatId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ea3803c31ed7eccb4aca9416504")
+
+  @@map("messages_model")
 }
 
-model posts_model {
-  id             Int              @id(map: "PK_d70f19613eb641c94bb122c4397") @default(autoincrement())
-  title          String           @db.VarChar
-  content        String           @db.VarChar
-  likeCount      Int
-  commentCount   Int
-  authorId       Int
-  updatedAt      DateTime         @default(now()) @db.Timestamp(6)
-  createdAt      DateTime         @default(now()) @db.Timestamp(6)
-  comments_model comments_model[]
-  image_model    image_model[]
-  users_model    users_model      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_c8b7f084ae29a7104846f1bec05")
+model PostsModel {
+  id            Int             @id(map: "PK_d70f19613eb641c94bb122c4397") @default(autoincrement())
+  title         String          @db.VarChar
+  content       String          @db.VarChar
+  likeCount     Int
+  commentCount  Int
+  authorId      Int
+  updatedAt     DateTime        @default(now()) @db.Timestamp(6)
+  createdAt     DateTime        @default(now()) @db.Timestamp(6)
+  commentsModel CommentsModel[]
+  imageModel    ImageModel[]
+  author        UsersModel      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_c8b7f084ae29a7104846f1bec05")
+
+  @@map("posts_model")
 }
 
-model user_followers_model {
-  id                                                       Int          @id(map: "PK_567b39f0fb420f63ef11095f474") @default(autoincrement())
-  updatedAt                                                DateTime     @default(now()) @db.Timestamp(6)
-  createdAt                                                DateTime     @default(now()) @db.Timestamp(6)
-  isConfirmed                                              Boolean      @default(false)
-  followerId                                               Int?
-  followeeId                                               Int?
-  users_model_user_followers_model_followeeIdTousers_model users_model? @relation("user_followers_model_followeeIdTousers_model", fields: [followeeId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_7c12be097b786317829ba012ba0")
-  users_model_user_followers_model_followerIdTousers_model users_model? @relation("user_followers_model_followerIdTousers_model", fields: [followerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_dccf79aa2a78b614aae3401eef2")
+model UserFollowersModel {
+  id          Int         @id(map: "PK_567b39f0fb420f63ef11095f474") @default(autoincrement())
+  updatedAt   DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  isConfirmed Boolean     @default(false)
+  followerId  Int?        @map("follower_id")
+  followeeId  Int?        @map("followee_id")
+  followee    UsersModel? @relation("followee_id", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_7c12be097b786317829ba012ba0")
+  follower    UsersModel? @relation("follower_id", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_dccf79aa2a78b614aae3401eef2")
+
+  @@map("user_followers_model")
 }
 
-model users_model {
-  id                                                                                              Int                                 @id(map: "PK_1355f66d5ebddb2449c566571c8") @default(autoincrement())
-  nickname                                                                                        String                              @unique(map: "UQ_cf2c74837f74a2d823d330293a4") @db.VarChar(20)
-  email                                                                                           String                              @unique(map: "UQ_d3129562d6ac1c574e5e909e4ed") @db.VarChar
-  password                                                                                        String                              @db.VarChar
-  role                                                                                            users_model_role_enum               @default(USER)
-  createdAt                                                                                       DateTime                            @default(now()) @db.Timestamp(6)
-  updatedAt                                                                                       DateTime                            @default(now()) @db.Timestamp(6)
-  messagesId                                                                                      Int?
-  followerCount                                                                                   Int                                 @default(0)
-  followeeCount                                                                                   Int                                 @default(0)
-  comments_model                                                                                  comments_model[]
-  messages_model_messages_model_authorIdTousers_model                                             messages_model[]                    @relation("messages_model_authorIdTousers_model")
-  posts_model                                                                                     posts_model[]
-  user_followers_model_user_followers_model_followeeIdTousers_model                               user_followers_model[]              @relation("user_followers_model_followeeIdTousers_model")
-  user_followers_model_user_followers_model_followerIdTousers_model                               user_followers_model[]              @relation("user_followers_model_followerIdTousers_model")
-  messages_model_users_model_messagesIdTomessages_model                                           messages_model?                     @relation("users_model_messagesIdTomessages_model", fields: [messagesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_af4b8711587abc83cda296fbacc")
-  users_model_chats_chats_model                                                                   users_model_chats_chats_model[]
-  users_model_followers_users_model_users_model_followers_users_model_usersModelId_1Tousers_model users_model_followers_users_model[] @relation("users_model_followers_users_model_usersModelId_1Tousers_model")
-  users_model_followers_users_model_users_model_followers_users_model_usersModelId_2Tousers_model users_model_followers_users_model[] @relation("users_model_followers_users_model_usersModelId_2Tousers_model")
+model UsersModel {
+  id              Int                  @id(map: "PK_1355f66d5ebddb2449c566571c8") @default(autoincrement())
+  nickname        String               @unique(map: "UQ_cf2c74837f74a2d823d330293a4") @db.VarChar(20)
+  email           String               @unique(map: "UQ_d3129562d6ac1c574e5e909e4ed") @db.VarChar
+  password        String               @db.VarChar
+  role            UsersModelRoleEnum   @default(USER)
+  updatedAt       DateTime             @default(now()) @map("updated_at") @db.Timestamp(6)
+  createdAt       DateTime             @default(now()) @map("created_at") @db.Timestamp(6)
+  messagesId      Int?                 @map("message_id")
+  followerCount   Int                  @default(0) @map("follower_count")
+  followeeCount   Int                  @default(0) @map("followee_count")
+  commentsModel   CommentsModel[]
+  messages        MessagesModel[]
+  postsModel      PostsModel[]
+  followees       UserFollowersModel[] @relation("followee_id")
+  followers       UserFollowersModel[] @relation("follower_id")
+  usersChatsModel UsersChatsModel[]
+
+  @@map("users_model")
 }
 
-model users_model_chats_chats_model {
-  usersModelId Int
-  chatsModelId Int
-  users_model  users_model @relation(fields: [usersModelId], references: [id], onDelete: Cascade, map: "FK_6d8216f552d980bdaa2bae7e93d")
-  chats_model  chats_model @relation(fields: [chatsModelId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_81161993d9b420943ac1c494525")
+model UsersChatsModel {
+  usersModelId Int        @map("users_model_id")
+  chatsModelId Int        @map("chats_model_id")
+  usersModel   UsersModel @relation(fields: [usersModelId], references: [id], onDelete: Cascade, map: "FK_6d8216f552d980bdaa2bae7e93d")
+  chatsModel   ChatsModel @relation(fields: [chatsModelId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_81161993d9b420943ac1c494525")
 
   @@id([usersModelId, chatsModelId], map: "PK_5bb92fb95e42ac2b6b778ce87dc")
   @@index([usersModelId], map: "IDX_6d8216f552d980bdaa2bae7e93")
   @@index([chatsModelId], map: "IDX_81161993d9b420943ac1c49452")
+  @@map("users_chats_model")
 }
 
-model users_model_followers_users_model {
-  usersModelId_1                                                            Int
-  usersModelId_2                                                            Int
-  users_model_users_model_followers_users_model_usersModelId_1Tousers_model users_model @relation("users_model_followers_users_model_usersModelId_1Tousers_model", fields: [usersModelId_1], references: [id], onDelete: Cascade, map: "FK_2800f7786f0018c884ddc9aad3e")
-  users_model_users_model_followers_users_model_usersModelId_2Tousers_model users_model @relation("users_model_followers_users_model_usersModelId_2Tousers_model", fields: [usersModelId_2], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_2b73b5ccf99c1596cc181704fbe")
-
-  @@id([usersModelId_1, usersModelId_2], map: "PK_b077d1c8b72a4c0ce4e42f800a2")
-  @@index([usersModelId_1], map: "IDX_2800f7786f0018c884ddc9aad3")
-  @@index([usersModelId_2], map: "IDX_2b73b5ccf99c1596cc181704fb")
-}
-
-enum users_model_role_enum {
+enum UsersModelRoleEnum {
   ADMIN
   USER
 }
