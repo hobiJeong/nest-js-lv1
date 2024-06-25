@@ -36,6 +36,7 @@ import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 import { RolesGuard } from 'src/users/guard/roles.guard';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { UserFollowersModel } from 'src/users/entity/user-followers.entity';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ dotenv.config();
  */
 @Module({
   imports: [
+    PrismaModule,
     PostsModule,
     ServeStaticModule.forRoot({
       // 4022.jpg
