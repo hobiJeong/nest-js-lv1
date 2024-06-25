@@ -696,6 +696,11 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
+"@nestjs-cls/transactional@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@nestjs-cls/transactional/-/transactional-2.3.1.tgz#0b24a32d95efa18a4981c485d4548cff9d0f0a40"
+  integrity sha512-V28v+8ul89tuIp1OtvL62tvT1zsl+Fy3m5NVMbHtUWkf6mg+MXG1UQ1d7eK1KW5ZwCHppDXSKjoQUlpRekcwaQ==
+
 "@nestjs/cli@^10.0.0":
   version "10.3.2"
   resolved "https://registry.npmjs.org/@nestjs/cli/-/cli-10.3.2.tgz"
@@ -4219,6 +4224,11 @@ neo-async@^2.6.2:
   version "2.6.2"
   resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
+
+nestjs-cls@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/nestjs-cls/-/nestjs-cls-4.3.0.tgz#1d8e8f5db8557392c6c8ff1eafd590e5d11d7815"
+  integrity sha512-MVTun6tqCZih8AJXRj8uBuuFyJhQrIA9m9fStiQjbBXUkE3BrlMRvmLzyw8UcneB3xtFFTfwkAh5PYKRulyaOg==
 
 node-abort-controller@^3.0.1:
   version "3.1.1"
