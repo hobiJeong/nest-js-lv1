@@ -1,11 +1,7 @@
 import { Body, Controller, Headers, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { MaxLengthPipe, MinLengthPipe } from 'src/auth/pipe/password.pipe';
 import { BasicTokenGuard } from 'src/auth/guard/basic-token.guard';
-import {
-  AccessTokenGuard,
-  RefreshTokenGuard,
-} from 'src/auth/guard/bearer-token.guard';
+import { RefreshTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
 

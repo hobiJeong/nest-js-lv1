@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UserFollowersModel } from 'src/users/entity/user-followers.entity';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { QueryRunner, Repository } from 'typeorm';
@@ -11,6 +12,7 @@ export class UsersService {
     private readonly usersRepository: Repository<UsersModel>,
     @InjectRepository(UserFollowersModel)
     private readonly userFollowersRepository: Repository<UserFollowersModel>,
+    private readonly prisma: PrismaService,
   ) {}
 
   getUsersRepository(qr?: QueryRunner): Repository<UsersModel> {
