@@ -1,24 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { basename, join } from 'path';
 import { CommonService } from 'src/common/common.service';
-import {
-  POST_IMAGE_PATH,
-  PUBLIC_FOLDER_PATH,
-  TEMP_FOLDER_PATH,
-} from 'src/common/const/path.const';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 import { PostsModel } from 'src/posts/entity/posts.entity';
 import { QueryRunner, Repository } from 'typeorm';
-import { promises } from 'fs';
-import { CreatePostImageDto } from 'src/posts/image/dto/create-image.dto';
 import { ImageModel } from 'src/common/entity/image.entity';
 import { DEFAULT_POST_FIND_OPTIONS } from 'src/posts/const/default-post-find-options.const';
 
