@@ -36,7 +36,11 @@ import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
 import { RolesGuard } from 'src/users/guard/roles.guard';
 import { AccessTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { UserFollowersModel } from 'src/users/entity/user-followers.entity';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { CUSTOM_PRISMA_CLIENT, PrismaModule } from 'src/prisma/prisma.module';
+import { ClsModule } from 'nestjs-cls';
+import { ClsPluginTransactional } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 dotenv.config();
 
@@ -92,6 +96,18 @@ dotenv.config();
     CommonModule,
     ChatsModule,
     CommentsModule,
+    ClsModule.forRoot({
+      plugins: [
+        new ClsPluginTransactional({
+          imports: [PrismaModule],
+          adapter: new TransactionalAdapterPrisma({
+            prismaInjectionToken: PrismaService,
+          }),
+        }),
+      ],
+      global: true,
+      middleware: { mount: true },
+    }),
   ],
   controllers: [AppController],
   providers: [
@@ -108,6 +124,7 @@ dotenv.config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    PrismaService,
   ],
 })
 export class AppModule implements NestModule {
