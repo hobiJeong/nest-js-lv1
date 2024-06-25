@@ -696,6 +696,11 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
+"@nestjs-cls/transactional-adapter-prisma@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@nestjs-cls/transactional-adapter-prisma/-/transactional-adapter-prisma-1.2.1.tgz#0712f52f3be6b5cedc7da9893af9cac1820b097e"
+  integrity sha512-ZtrTzwXaJJwisPEWfAPSaToKAwYfcTH8dKZr26anOUgGAVEbkyueMORLJOFRpwpsrx3fk4CwrEh0kG2J5NiEzA==
+
 "@nestjs-cls/transactional@^2.3.1":
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/@nestjs-cls/transactional/-/transactional-2.3.1.tgz#0b24a32d95efa18a4981c485d4548cff9d0f0a40"
