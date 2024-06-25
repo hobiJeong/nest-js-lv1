@@ -113,6 +113,7 @@ model UsersChatsModel {
   chatsModelId Int        @map("chats_model_id")
   usersModel   UsersModel @relation(fields: [usersModelId], references: [id], onDelete: Cascade, map: "FK_6d8216f552d980bdaa2bae7e93d")
   chatsModel   ChatsModel @relation(fields: [chatsModelId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_81161993d9b420943ac1c494525")
+  testColumn  String @map("test_column")
 
   @@id([usersModelId, chatsModelId], map: "PK_5bb92fb95e42ac2b6b778ce87dc")
   @@index([usersModelId], map: "IDX_6d8216f552d980bdaa2bae7e93")
