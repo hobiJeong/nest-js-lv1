@@ -56,13 +56,11 @@ export class UsersService {
       throw new BadRequestException('이미 가입한 이메일입니다!');
     }
 
-    const userObject = this.prisma.usersModel.create({
+    const userObject = await this.prisma.usersModel.create({
       data: {
         ...user,
       },
     });
-
-    console.log(userObject);
 
     return userObject;
   }
