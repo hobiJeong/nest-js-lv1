@@ -1,9 +1,4 @@
-import {
-  UseFilters,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -15,16 +10,15 @@ import {
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
+import { UsersModel } from '@prisma/client';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { SocketBearerTokenGuard } from 'src/auth/guard/socket/socket-bearer-token.guard';
 import { ChatsService } from 'src/chats/chats.service';
 import { CreateChatDto } from 'src/chats/dto/create-chat.dto';
 import { EnterChatDto } from 'src/chats/dto/enter-chat.dto';
 import { CreateMessagesDto } from 'src/chats/messages/dto/create-messages.dto';
 import { ChatsMessagesService } from 'src/chats/messages/messages.service';
 import { SocketCatchHttpExceptionFilter } from 'src/common/exception-filter/socket-catch-http.exception-filter';
-import { UsersModel } from 'src/users/entity/users.entity';
 import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
