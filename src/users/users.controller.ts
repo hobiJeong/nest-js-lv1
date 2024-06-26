@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Delete,
@@ -39,14 +40,15 @@ export class UsersController {
     return this.usersService.getFollowers(user.id, includeNotConfirmed);
   }
 
-  // @Post()
-  // postUser(
-  //   @Body('nickname') nickname: string,
-  //   @Body('email') email: string,
-  //   @Body('password') password: string,
-  // ) {
-  //   return this.usersService.createUser({ nickname, email, password });
-  // }
+  @Post()
+  postUser(
+    @Body('nickname') nickname: string,
+    @Body('email') email: string,
+    @Body('password') password: string,
+  ) {
+    return this.usersService.createUser({ nickname, email, password });
+  }
+
   @Post('follow/:id')
   async postFollow(
     @User() user: UsersModel,

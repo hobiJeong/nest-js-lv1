@@ -88,7 +88,7 @@ dotenv.config();
         CommentsModel,
         UserFollowersModel,
       ],
-      synchronize: true,
+      // synchronize: true,
       logging: true,
     }),
     UsersModule,
