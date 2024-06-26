@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   createParamDecorator,
 } from '@nestjs/common';
-import { UsersModel } from 'src/users/entity/users.entity';
+import { UsersModel } from '@prisma/client';
 
 export const User = createParamDecorator(
   (data: keyof UsersModel | undefined, context: ExecutionContext) => {

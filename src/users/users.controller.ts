@@ -18,8 +18,6 @@ import { RolesEnum } from 'src/users/const/roles.const';
 import { User } from 'src/users/decorator/user.decorator';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
-import { QR } from 'src/common/decorator/query-runner.decorator';
-import { QueryRunner } from 'typeorm';
 
 @Controller('users')
 export class UsersController {
@@ -64,11 +62,10 @@ export class UsersController {
   async patchFollowConfirm(
     @User() user: UsersModel,
     @Param('id', ParseIntPipe) followerId: number,
-    @QR() queryRunner: QueryRunner,
   ) {
-    await this.usersService.confirmFollow(followerId, user.id, queryRunner);
+    await this.usersService.confirmFollow(followerId, user.id);
 
-    await this.usersService.incrementFollowerCount(user.id, queryRunner);
+    await this.usersService.incrementFollowerCount(user.id);
 
     return true;
   }
@@ -77,10 +74,9 @@ export class UsersController {
   async deleteFollow(
     @User() user: UsersModel,
     @Param('id', ParseIntPipe) followeeId: number,
-    @QR() queryRunner: QueryRunner,
   ) {
     await this.usersService.deleteFollow(user.id, followeeId);
 
-    return this.usersService.incrementFollowerCount(user.id, queryRunner);
+    return this.usersService.incrementFollowerCount(user.id);
   }
 }

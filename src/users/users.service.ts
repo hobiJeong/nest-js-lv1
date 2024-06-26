@@ -1,31 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+
+import { UsersModel } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UserFollowersModel } from 'src/users/entity/user-followers.entity';
-import { UsersModel } from 'src/users/entity/users.entity';
-import { QueryRunner, Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(UsersModel)
-    private readonly usersRepository: Repository<UsersModel>,
-    @InjectRepository(UserFollowersModel)
-    private readonly userFollowersRepository: Repository<UserFollowersModel>,
-    private readonly prisma: PrismaService,
-  ) {}
-
-  getUsersRepository(qr?: QueryRunner): Repository<UsersModel> {
-    return qr
-      ? qr.manager.getRepository<UsersModel>(UsersModel)
-      : this.usersRepository;
-  }
-
-  getUserFollowersRepository(qr?: QueryRunner): Repository<UserFollowersModel> {
-    return qr
-      ? qr.manager.getRepository<UserFollowersModel>(UserFollowersModel)
-      : this.userFollowersRepository;
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
   async createUser(user: Pick<UsersModel, 'email' | 'nickname' | 'password'>) {
     // 1) nickname 중복이 없는지 확인
@@ -66,43 +50,41 @@ export class UsersService {
   }
 
   async getAllUsers() {
-    return this.usersRepository.find();
+    return this.prisma.usersModel.findMany();
   }
 
-  async getUserByEmail(email: string) {
-    return this.usersRepository.findOne({
+  async getUserByEmail(email: string): Promise<UsersModel> {
+    return this.prisma.usersModel.findUnique({
       where: {
         email,
       },
     });
   }
 
-  async followUser(followerId: number, followeeId: number, qr?: QueryRunner) {
-    const userFollowersRepository = this.getUserFollowersRepository(qr);
-
-    const result = await userFollowersRepository.save({
-      follower: {
-        id: followerId,
-      },
-      followee: {
-        id: followeeId,
+  async followUser(followerId: number, followeeId: number) {
+    return this.prisma.userFollowersModel.create({
+      data: {
+        followerId,
+        followeeId,
       },
     });
-
-    return true;
   }
 
   async getFollowers(userId: number, includeNotConfirmed: boolean) {
-    const where = { followee: { id: userId }, isConfirmed: true };
+    const where = {
+      followerId: userId,
+      isConfirmed: true,
+    };
 
     if (!includeNotConfirmed) {
       where['isConfirmed'] = true;
     }
 
-    const result = await this.userFollowersRepository.find({
+    const result = await this.prisma.userFollowersModel.findMany({
       where,
-      relations: { follower: true, followee: true },
+      include: { follower: true, followee: true },
     });
+
     return result.map((x) => ({
       id: x.follower.id,
       nickname: x.follower.nickname,
@@ -111,25 +93,11 @@ export class UsersService {
     }));
   }
 
-  async confirmFollow(
-    followerId: number,
-    followeeId: number,
-    qr?: QueryRunner,
-  ) {
-    const userFollowersRepository = this.getUserFollowersRepository(qr);
-
-    const existing = await userFollowersRepository.findOne({
+  async confirmFollow(followerId: number, followeeId: number) {
+    const existing = await this.prisma.userFollowersModel.findFirst({
       where: {
-        follower: {
-          id: followerId,
-        },
-        followee: {
-          id: followeeId,
-        },
-      },
-      relations: {
-        follower: true,
-        followee: true,
+        followerId,
+        followeeId,
       },
     });
 
@@ -137,43 +105,60 @@ export class UsersService {
       throw new BadRequestException('존재하지 않는 팔로우 요청입니다.');
     }
 
-    await userFollowersRepository.save({ ...existing, isConfirmed: true });
-
-    return true;
-  }
-
-  async deleteFollow(followerId: number, followeeId: number, qr?: QueryRunner) {
-    const userFollowersRepository = this.getUserFollowersRepository(qr);
-
-    await userFollowersRepository.delete({
-      follower: { id: followerId },
-      followee: { id: followeeId },
+    await this.prisma.userFollowersModel.upsert({
+      where: {
+        id: existing.id,
+      },
+      create: {
+        ...existing,
+      },
+      update: {
+        ...existing,
+      },
     });
 
     return true;
   }
 
-  async incrementFollowerCount(userId: number, qr?: QueryRunner) {
-    const usersRepository = this.getUsersRepository(qr);
-
-    await usersRepository.increment(
-      {
-        id: userId,
+  async deleteFollow(followerId: number, followeeId: number) {
+    const { id } = await this.prisma.userFollowersModel.findFirst({
+      where: {
+        followeeId,
+        followerId,
       },
-      'followerCount',
-      1,
-    );
+      select: { id: true },
+    });
+
+    if (!id) {
+      throw new NotFoundException('해당 팔로우가 존재하지 않습니다.');
+    }
+
+    await this.prisma.userFollowersModel.delete({
+      where: {
+        id,
+      },
+    });
+
+    return true;
   }
 
-  async decrementFollowerCount(userId: number, qr?: QueryRunner) {
-    const usersRepository = this.getUsersRepository(qr);
-
-    await usersRepository.decrement(
-      {
+  async incrementFollowerCount(userId: number) {
+    await this.prisma.usersModel.update({
+      where: {
         id: userId,
       },
-      'followerCount',
-      1,
-    );
+      data: {
+        followerCount: {
+          increment: 1,
+        },
+      },
+    });
+  }
+
+  async decrementFollowerCount(userId: number) {
+    await this.prisma.usersModel.update({
+      where: { id: userId },
+      data: { followerCount: { decrement: 1 } },
+    });
   }
 }
