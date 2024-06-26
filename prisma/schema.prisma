@@ -23,10 +23,10 @@ model CommentsModel {
   createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
   comment    String      @db.VarChar
   likeCount  Int         @map("like_count")
-  authorId   Int?        @map("author_id")
-  postId     Int?        @map("post_id")
-  usersModel UsersModel? @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_26a4df66c84022300d49a4c7c8e")
-  postsModel PostsModel? @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_30172445adc82b4acfa72e162ee")
+  authorId   Int        @map("author_id")
+  postId     Int        @map("post_id")
+  usersModel UsersModel @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_26a4df66c84022300d49a4c7c8e")
+  postsModel PostsModel @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_30172445adc82b4acfa72e162ee")
 
   @@map("comments_model")
 }
@@ -50,8 +50,8 @@ model MessagesModel {
   updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
   createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
   message    String      @db.VarChar
-  chatId     Int?        @map("chat_id")
-  authorId   Int?        @map("author_id")
+  chatId     Int        @map("chat_id")
+  authorId   Int        @map("author_id")
   author     UsersModel? @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_65a138da666c7f41f44c7c22206")
   chatsModel ChatsModel? @relation(fields: [chatId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ea3803c31ed7eccb4aca9416504")
 
@@ -79,10 +79,10 @@ model UserFollowersModel {
   updatedAt   DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
   createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
   isConfirmed Boolean     @default(false)
-  followerId  Int?        @map("follower_id")
-  followeeId  Int?        @map("followee_id")
-  followee    UsersModel? @relation("followee_id", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_7c12be097b786317829ba012ba0")
-  follower    UsersModel? @relation("follower_id", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_dccf79aa2a78b614aae3401eef2")
+  followerId  Int        @map("follower_id")
+  followeeId  Int        @map("followee_id")
+  followee    UsersModel @relation("followee_id", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_7c12be097b786317829ba012ba0")
+  follower    UsersModel @relation("follower_id", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_dccf79aa2a78b614aae3401eef2")
 
   @@map("user_followers_model")
 }
@@ -95,7 +95,6 @@ model UsersModel {
   role            UsersModelRoleEnum   @default(USER)
   updatedAt       DateTime             @default(now()) @map("updated_at") @db.Timestamp(6)
   createdAt       DateTime             @default(now()) @map("created_at") @db.Timestamp(6)
-  messagesId      Int?                 @map("message_id")
   followerCount   Int                  @default(0) @map("follower_count")
   followeeCount   Int                  @default(0) @map("followee_count")
   commentsModel   CommentsModel[]
