@@ -4,6 +4,8 @@ import { BasicTokenGuard } from 'src/auth/guard/basic-token.guard';
 import { RefreshTokenGuard } from 'src/auth/guard/bearer-token.guard';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
+import { User } from 'src/users/decorator/user.decorator';
+import { UsersModel } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -44,15 +46,10 @@ export class AuthController {
   @Post('login/email')
   @IsPublic()
   @UseGuards(BasicTokenGuard)
-  postLoginEmail(@Headers('authorization') rawToken: string) {
-    // email:password -> base64
-    const token = this.authService.extractTokenFormHeader(rawToken, false);
-
-    const credentials = this.authService.decodeBasicToken(token);
-
+  postLoginEmail(@User() user: UsersModel) {
     return this.authService.loginWithEmail({
-      email: credentials.email,
-      password: credentials.password,
+      email: user.email,
+      password: user.password,
     });
   }
 
