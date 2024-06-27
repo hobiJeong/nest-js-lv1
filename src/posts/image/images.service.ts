@@ -1,28 +1,26 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { join, basename } from 'path';
 import { TEMP_FOLDER_PATH, POST_IMAGE_PATH } from 'src/common/const/path.const';
-import { ImageModel } from 'src/common/entity/image.entity';
 import { promises } from 'fs';
-import { QueryRunner, Repository } from 'typeorm';
 import { CreatePostImageDto } from 'src/posts/image/dto/create-image.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { ImageModel, Prisma } from '@prisma/client';
 
 @Injectable()
 export class PostsImagesService {
-  constructor(
-    @InjectRepository(ImageModel)
-    private readonly imageRepository: Repository<ImageModel>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  getRepository(qr: QueryRunner) {
-    return qr
-      ? qr.manager.getRepository<ImageModel>(ImageModel)
-      : this.imageRepository;
+  getTx(
+    tx?: Prisma.TransactionClient,
+  ): PrismaService | Prisma.TransactionClient {
+    return tx ? tx : this.prisma;
   }
 
-  async createPostImage(dto: CreatePostImageDto, qr?: QueryRunner) {
-    const repository = this.getRepository(qr);
-
+  async createPostImage(
+    dto: CreatePostImageDto,
+    tx?: Prisma.TransactionClient,
+  ): Promise<ImageModel> {
+    const prisma = this.getTx(tx);
     // dto의 image 이름을 기반으로
     // 파일의 경로를 생성한다.
     const tempFilePath = join(TEMP_FOLDER_PATH, dto.path);
@@ -44,8 +42,10 @@ export class PostsImagesService {
     const newPath = join(POST_IMAGE_PATH, fileName);
 
     // save
-    const result = await repository.save({
-      ...dto,
+    const result = await prisma.imageModel.create({
+      data: {
+        ...dto,
+      },
     });
 
     // 파일 옮기기

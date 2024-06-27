@@ -11,16 +11,8 @@ export class MessagesController {
     @Query() dto: BasePaginationDto,
     @Param('cid', ParseIntPipe) cid: number,
   ) {
-    return this.messagesService.paginateMessages(dto, {
-      where: {
-        chat: {
-          id: cid,
-        },
-      },
-      relations: {
-        author: true,
-        chat: true,
-      },
-    });
+    dto['where__chatId'] = cid;
+
+    return this.messagesService.paginateMessages(dto);
   }
 }

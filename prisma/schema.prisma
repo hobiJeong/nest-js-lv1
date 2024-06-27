@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -37,7 +38,7 @@ model ImageModel {
   updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
   createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
   order      Int         @default(0)
-  type       Int
+  type       ImageType
   path       String      @db.VarChar
   postId     Int?        @map("post_id")
   postsModel PostsModel? @relation(fields: [postId], references: [id], onDelete: Cascade, map: "FK_40cd89c6655ec7b102842feacab")
@@ -62,7 +63,7 @@ model PostsModel {
   id            Int             @id(map: "PK_d70f19613eb641c94bb122c4397") @default(autoincrement())
   title         String          @db.VarChar
   content       String          @db.VarChar
-  likeCount     Int
+  likeCount     Int             
   commentCount  Int
   authorId      Int
   updatedAt     DateTime        @default(now()) @db.Timestamp(6)
@@ -122,4 +123,8 @@ model UsersChatsModel {
 enum UsersModelRoleEnum {
   ADMIN
   USER
+}
+
+enum ImageType {
+  POST
 }

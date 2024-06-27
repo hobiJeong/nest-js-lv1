@@ -6,6 +6,7 @@ import { CreateCommentDto } from 'src/posts/comments/dto/create-comment.dto';
 import { PaginateCommentsDto } from 'src/posts/comments/dto/paginate-comments.dto';
 import { UpdateCommentDto } from 'src/posts/comments/dto/update-comment.dto';
 import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { QueryRunner, Repository } from 'typeorm';
 
@@ -15,6 +16,7 @@ export class CommentsService {
     @InjectRepository(CommentsModel)
     private readonly commentsRepository: Repository<CommentsModel>,
     private readonly commonService: CommonService,
+    private readonly prisma: PrismaService,
   ) {}
 
   getRepository(qr?: QueryRunner) {
@@ -26,17 +28,7 @@ export class CommentsService {
   paginateComments(dto: PaginateCommentsDto, postId: number) {
     return this.commonService.paginate(
       dto,
-      this.commentsRepository,
-      {
-        where: {
-          post: {
-            id: postId,
-          },
-        },
-        relations: {
-          author: true,
-        },
-      },
+      this.prisma.client.commentsModel,
       `posts/${postId}/comments`,
     );
   }

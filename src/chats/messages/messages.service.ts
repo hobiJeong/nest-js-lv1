@@ -4,7 +4,8 @@ import { CreateMessagesDto } from 'src/chats/messages/dto/create-messages.dto';
 import { MessagesModel } from 'src/chats/messages/entity/messages.entity';
 import { CommonService } from 'src/common/common.service';
 import { BasePaginationDto } from 'src/common/dto/base-pagination.dto';
-import { FindManyOptions, Repository } from 'typeorm';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatsMessagesService {
@@ -12,6 +13,7 @@ export class ChatsMessagesService {
     @InjectRepository(MessagesModel)
     private readonly messagesRepository: Repository<MessagesModel>,
     private readonly commonService: CommonService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async createMessage(dto: CreateMessagesDto, authorId: number) {
@@ -35,14 +37,10 @@ export class ChatsMessagesService {
     });
   }
 
-  paginateMessages(
-    dto: BasePaginationDto,
-    overrideFindOptions: FindManyOptions<MessagesModel>,
-  ) {
+  paginateMessages(dto: BasePaginationDto) {
     return this.commonService.paginate(
       dto,
-      this.messagesRepository,
-      overrideFindOptions,
+      this.prisma.client.messagesModel,
       'messages',
     );
   }

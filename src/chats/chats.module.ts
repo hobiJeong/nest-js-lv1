@@ -10,6 +10,7 @@ import { MessagesModel } from 'src/chats/messages/entity/messages.entity';
 import { MessagesController } from 'src/chats/messages/messages.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UsersModule } from 'src/users/users.module';
     CommonModule,
     AuthModule,
     UsersModule,
+    PrismaModule,
   ],
   controllers: [ChatsController, MessagesController],
   providers: [ChatsGateway, ChatsService, ChatsMessagesService],

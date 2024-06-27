@@ -1,9 +1,13 @@
-import { PickType } from '@nestjs/mapped-types';
-import { ImageModel } from 'src/common/entity/image.entity';
+import { $Enums, ImageModel } from '@prisma/client';
 
-export class CreatePostImageDto extends PickType(ImageModel, [
-  'path',
-  'post',
-  'order',
-  'type',
-]) {}
+export class CreatePostImageDto
+  implements Pick<ImageModel, 'postId' | 'order' | 'path' | 'type'>
+{
+  postId: number;
+
+  order: number;
+
+  path: string;
+
+  type: $Enums.ImageType;
+}

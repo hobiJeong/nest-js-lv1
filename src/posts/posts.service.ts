@@ -5,20 +5,27 @@ import { CommonService } from 'src/common/common.service';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
-import { PostsModel } from 'src/posts/entity/posts.entity';
 import { QueryRunner, Repository } from 'typeorm';
-import { ImageModel } from 'src/common/entity/image.entity';
+import { ImageModelType } from 'src/common/entity/image.entity';
 import { DEFAULT_POST_FIND_OPTIONS } from 'src/posts/const/default-post-find-options.const';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { $Enums, PostsModel, Prisma } from '@prisma/client';
+import { PostsModel as PostEntity } from 'src/posts/entity/posts.entity';
+import { PostsImagesService } from 'src/posts/image/images.service';
+
+import { plainToInstance } from 'class-transformer';
+import { ImageModel } from 'src/common/entity/image.model';
 
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectRepository(PostsModel)
-    private readonly postsRepository: Repository<PostsModel>,
-    @InjectRepository(ImageModel)
-    private readonly imageRepository: Repository<ImageModel>,
+    @InjectRepository(PostEntity)
+    private readonly postsRepository: Repository<PostEntity>,
+
     private readonly commonService: CommonService,
     private readonly configService: ConfigService,
+    private readonly prisma: PrismaService,
+    private readonly postsImagesService: PostsImagesService,
   ) {}
 
   async getAllPosts() {
@@ -41,8 +48,7 @@ export class PostsService {
   async paginatePosts(dto: PaginatePostDto) {
     return this.commonService.paginate(
       dto,
-      this.postsRepository,
-      { ...DEFAULT_POST_FIND_OPTIONS },
+      this.prisma.client.postsModel,
       'posts',
     );
 
@@ -53,13 +59,13 @@ export class PostsService {
     // }
   }
 
-  async getPostById(id: number, qr?: QueryRunner) {
-    const repository = this.getRepository(qr);
-
-    const post = await repository.findOne({
-      ...DEFAULT_POST_FIND_OPTIONS,
+  async getPostById(id: number): Promise<PostsModel> {
+    const post = await this.prisma.postsModel.findUnique({
       where: {
         id,
+      },
+      include: {
+        author: true,
       },
     });
 
@@ -72,7 +78,7 @@ export class PostsService {
 
   getRepository(qr?: QueryRunner) {
     return qr
-      ? qr.manager.getRepository<PostsModel>(PostsModel)
+      ? qr.manager.getRepository<PostEntity>(PostEntity)
       : this.postsRepository;
   }
 
@@ -100,26 +106,42 @@ export class PostsService {
     );
   }
 
-  async createPost(authorId: number, postDto: CreatePostDto, qr?: QueryRunner) {
-    /**
-     * 1) create -> 저장할 객체를 생성한다
-     * 2) save -> 객체를 저장한다. (create 메서드에서 생성한 객체로)
-     */
-    const repository = this.getRepository(qr);
+  async createPost(
+    authorId: number,
+    postDto: CreatePostDto,
+  ): Promise<
+    PostsModel & { author: Prisma.$UsersModelPayload['scalars'] } & {
+      imageModel: ImageModel[];
+    }
+  > {
+    return this.prisma.$transaction(async (tx) => {
+      const post = await tx.postsModel.create({
+        data: { authorId, ...postDto, likeCount: 0, commentCount: 0 },
+        include: { author: true },
+      });
 
-    const post = repository.create({
-      author: {
-        id: authorId,
-      },
-      ...postDto,
-      images: [],
-      likeCount: 0,
-      commentCount: 0,
+      let imagesModel: ImageModel[];
+
+      for (let i = 0; i < postDto.images.length; i++) {
+        const image = await this.postsImagesService.createPostImage(
+          {
+            postId: post.id,
+            order: i,
+            path: postDto.images[i],
+            type: $Enums.ImageType.POST,
+          },
+          tx,
+        );
+
+        imagesModel.push(plainToInstance(ImageModel, image));
+      }
+
+      post['imageModel'] = imagesModel;
+
+      return post as PostsModel & {
+        author: Prisma.$UsersModelPayload['scalars'];
+      } & { imageModel: ImageModel[] };
     });
-
-    await repository.save(post);
-
-    return post;
   }
 
   async updatePost(postId: number, postDto: UpdatePostDto) {

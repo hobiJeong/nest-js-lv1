@@ -1,10 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { join } from 'path';
-import {
-  POST_IMAGE_PATH,
-  POST_PUBLIC_IMAGE_PATH,
-} from 'src/common/const/path.const';
+import { POST_PUBLIC_IMAGE_PATH } from 'src/common/const/path.const';
 import { BaseModel } from 'src/common/entity/base.entity';
 import { PostsModel } from 'src/posts/entity/posts.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';

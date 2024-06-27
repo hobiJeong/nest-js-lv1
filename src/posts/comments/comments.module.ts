@@ -9,6 +9,7 @@ import { UsersModule } from 'src/users/users.module';
 import { PostsExistsMiddleware } from 'src/posts/comments/middleware/post-exists.middleware';
 import { PostsModule } from 'src/posts/posts.module';
 import { SERVICE_TOKEN } from 'src/common/guard/is-mine-or-admin.guard';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SERVICE_TOKEN } from 'src/common/guard/is-mine-or-admin.guard';
     AuthModule,
     UsersModule,
     PostsModule,
+    PrismaModule,
   ],
   controllers: [CommentsController],
   providers: [

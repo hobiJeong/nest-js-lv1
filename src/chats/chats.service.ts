@@ -4,6 +4,7 @@ import { CreateChatDto } from 'src/chats/dto/create-chat.dto';
 import { PaginateChatDto } from 'src/chats/dto/paginate-chat.dto';
 import { ChatsModel } from 'src/chats/entity/chats.entity';
 import { CommonService } from 'src/common/common.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -12,13 +13,13 @@ export class ChatsService {
     @InjectRepository(ChatsModel)
     private readonly chatsRepository: Repository<ChatsModel>,
     private readonly commonService: CommonService,
+    private readonly prisma: PrismaService,
   ) {}
 
-  paginateChats(dto: PaginateChatDto) {
+  async paginateChats(dto: PaginateChatDto) {
     return this.commonService.paginate(
       dto,
-      this.chatsRepository,
-      { relations: { users: true } },
+      this.prisma.client.chatsModel,
       'chats',
     );
   }
