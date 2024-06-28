@@ -76,34 +76,40 @@ export class PostsService {
     return post;
   }
 
-  getRepository(qr?: QueryRunner) {
-    return qr
-      ? qr.manager.getRepository<PostEntity>(PostEntity)
-      : this.postsRepository;
+  getTx(
+    tx?: Prisma.TransactionClient,
+  ): Prisma.TransactionClient | PrismaService {
+    return tx ? tx : this.prisma;
   }
 
-  async incrementCommentCount(postId: number, qr?: QueryRunner) {
-    const repository = this.getRepository(qr);
+  async incrementCommentCount(postId: number, tx?: Prisma.TransactionClient) {
+    const prisma = this.getTx(tx);
 
-    await repository.increment(
-      {
+    await prisma.postsModel.update({
+      where: {
         id: postId,
       },
-      'commentCount',
-      1,
-    );
+      data: {
+        commentCount: {
+          increment: 1,
+        },
+      },
+    });
   }
 
-  async decrementCommentCount(postId: number, qr?: QueryRunner) {
-    const repository = this.getRepository(qr);
+  async decrementCommentCount(postId: number, tx?: Prisma.TransactionClient) {
+    const prisma = this.getTx(tx);
 
-    await repository.decrement(
-      {
+    await prisma.postsModel.update({
+      where: {
         id: postId,
       },
-      'commentCount',
-      1,
-    );
+      data: {
+        commentCount: {
+          decrement: 1,
+        },
+      },
+    });
   }
 
   async createPost(
