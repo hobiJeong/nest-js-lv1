@@ -64,7 +64,7 @@ export class CommentsController {
       queryRunner,
     );
 
-    await this.postsService.incrementCommentCount(postId, queryRunner);
+    await this.postsService.incrementCommentCount(postId);
 
     return resp;
   }

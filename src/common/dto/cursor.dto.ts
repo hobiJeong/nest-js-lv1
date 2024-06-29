@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsNumberString, IsOptional, IsPositive } from 'class-validator';
+import { IsNumberString, IsOptional } from 'class-validator';
 
 export class CursorDto {
   @IsNumberString()

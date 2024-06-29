@@ -14,6 +14,7 @@ import { PostsImagesService } from 'src/posts/image/images.service';
 import { plainToInstance } from 'class-transformer';
 import type { PostWithAuthorAndImages } from 'src/posts/type/post.type';
 import { PostImageModel } from 'src/common/entity/image.model';
+import { PostsPaginateFindManyArgs } from 'src/common/const/find-many-args.type';
 
 @Injectable()
 export class PostsService {
@@ -48,11 +49,12 @@ export class PostsService {
   }
 
   async paginatePosts(dto: PaginatePostDto) {
-    return this.commonService.paginate(
-      dto,
-      this.prisma.client.postsModel,
-      'posts',
-    );
+    this.prisma.chatsModel;
+    return this.commonService.paginate<
+      PaginatePostDto,
+      PostsModel,
+      PostsPaginateFindManyArgs
+    >(dto, this.prisma.client.postsModel, 'posts');
   }
 
   async getPostById(id: number): Promise<PostsModel> {

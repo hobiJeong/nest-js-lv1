@@ -14,6 +14,7 @@ import {
   ENV_HOST_KEY,
   ENV_PROTOCOL_KEY,
 } from 'src/common/const/env-keys.const';
+import { FindManyAggregates, FindManyArgs } from 'src/common/const/find-many-args.type';
 import { OrderInputType } from 'src/common/const/order-input.type';
 import { WhereInputType } from 'src/common/const/where-input.type';
 
@@ -25,15 +26,21 @@ import { BaseModel } from 'src/common/entity/base.model';
 export class CommonService {
   constructor(private readonly configService: ConfigService) {}
 
-  paginate<T extends BasePaginationDto, M extends BaseModel>(
+  paginate<
+    T extends BasePaginationDto,
+    M extends BaseModel,
+    A extends FindManyAggregates,
+  >(
     dto: T,
     prismaModel: { paginate: Paginator<PaginatorOptions> },
     path: string,
+    overrideOptions?: FindManyArgs<A, M>,
   ) {
     if (typeof dto.paginationBy === 'number') {
-      return this.pagePaginate<T, M, WhereInputType, OrderInputType>(
+      return this.pagePaginate<T, M, WhereInputType, OrderInputType, A>(
         dto,
         prismaModel,
+        overrideOptions,
       );
     } else if (dto.paginationBy instanceof CursorDto) {
       return this.cursorPaginate(dto, prismaModel, path);
@@ -45,7 +52,12 @@ export class CommonService {
     M extends BaseModel,
     K extends WhereInputType,
     Y extends OrderInputType,
-  >(dto: T, prismaModel: { paginate: Paginator<PaginatorOptions> }) {
+    A extends FindManyAggregates,
+  >(
+    dto: T,
+    prismaModel: { paginate: Paginator<PaginatorOptions> },
+    overrideOptions = <FindManyArgs<A, M>>{},
+  ) {
     const { where, orderBy } = this.composeFindOptions<K, Y>(dto);
 
     const [data, pageNumberMeta]: [
@@ -55,6 +67,7 @@ export class CommonService {
       .paginate({
         where,
         orderBy,
+        ...(overrideOptions as any),
       })
       .withPages({
         includePageCount: true,
@@ -74,6 +87,7 @@ export class CommonService {
     dto: T,
     prismaModel: { paginate: Paginator<PaginatorOptions> },
     path: string,
+    overrideOptions = <FindManyArgs<FindManyAggregates, M>>{},
   ) {
     /**
      * where__likeCount_more_than
@@ -89,6 +103,7 @@ export class CommonService {
         .paginate({
           where,
           orderBy,
+          ...(overrideOptions as any),
         })
         .withCursor({
           limit: dto.take,
