@@ -22,7 +22,6 @@ export class PostsService {
     private readonly postsRepository: Repository<PostEntity>,
 
     private readonly commonService: CommonService,
-    private readonly configService: ConfigService,
     private readonly prisma: PrismaService,
     private readonly postsImagesService: PostsImagesService,
   ) {}
