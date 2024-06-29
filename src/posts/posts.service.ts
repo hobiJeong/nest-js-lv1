@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
@@ -13,18 +12,24 @@ import { PostsModel as PostEntity } from 'src/posts/entity/posts.entity';
 import { PostsImagesService } from 'src/posts/image/images.service';
 
 import { plainToInstance } from 'class-transformer';
-import { ImageModel } from 'src/common/entity/image.model';
+import type { PostWithAuthorAndImages } from 'src/posts/type/post.type';
+import { PostImageModel } from 'src/common/entity/image.model';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(PostEntity)
     private readonly postsRepository: Repository<PostEntity>,
-
     private readonly commonService: CommonService,
     private readonly prisma: PrismaService,
     private readonly postsImagesService: PostsImagesService,
   ) {}
+
+  getTx(
+    tx?: Prisma.TransactionClient,
+  ): Prisma.TransactionClient | PrismaService {
+    return tx ? tx : this.prisma;
+  }
 
   async getAllPosts() {
     return this.postsRepository.find({
@@ -42,19 +47,12 @@ export class PostsService {
     }
   }
 
-  // 1) 오름차 순으로 정렬하는 pagination만 구현한다
   async paginatePosts(dto: PaginatePostDto) {
     return this.commonService.paginate(
       dto,
       this.prisma.client.postsModel,
       'posts',
     );
-
-    // if (dto.page) {
-    //   return this.pagePaginatePosts(dto);
-    // } else {
-    //   return this.cursorPaginatePosts(dto);
-    // }
   }
 
   async getPostById(id: number): Promise<PostsModel> {
@@ -72,12 +70,6 @@ export class PostsService {
     }
 
     return post;
-  }
-
-  getTx(
-    tx?: Prisma.TransactionClient,
-  ): Prisma.TransactionClient | PrismaService {
-    return tx ? tx : this.prisma;
   }
 
   async incrementCommentCount(postId: number, tx?: Prisma.TransactionClient) {
@@ -113,18 +105,14 @@ export class PostsService {
   async createPost(
     authorId: number,
     postDto: CreatePostDto,
-  ): Promise<
-    PostsModel & { author: Prisma.$UsersModelPayload['scalars'] } & {
-      imageModel: ImageModel[];
-    }
-  > {
+  ): Promise<PostWithAuthorAndImages> {
     return this.prisma.$transaction(async (tx) => {
       const post = await tx.postsModel.create({
         data: { authorId, ...postDto, likeCount: 0, commentCount: 0 },
         include: { author: true },
       });
 
-      let imagesModel: ImageModel[];
+      const imagesModel: PostImageModel[] = [];
 
       for (let i = 0; i < postDto.images.length; i++) {
         const image = await this.postsImagesService.createPostImage(
@@ -137,14 +125,12 @@ export class PostsService {
           tx,
         );
 
-        imagesModel.push(plainToInstance(ImageModel, image));
+        imagesModel.push(plainToInstance(PostImageModel, image));
       }
 
       post['imageModel'] = imagesModel;
 
-      return post as PostsModel & {
-        author: Prisma.$UsersModelPayload['scalars'];
-      } & { imageModel: ImageModel[] };
+      return post as PostWithAuthorAndImages;
     });
   }
 
