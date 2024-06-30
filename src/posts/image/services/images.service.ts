@@ -3,24 +3,15 @@ import { join, basename } from 'path';
 import { TEMP_FOLDER_PATH, POST_IMAGE_PATH } from 'src/common/const/path.const';
 import { promises } from 'fs';
 import { CreatePostImageDto } from 'src/posts/image/dto/create-image.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ImageModel, Prisma } from '@prisma/client';
+
+import { ImageModel } from '@prisma/client';
+import { PostsImagesRepository } from 'src/posts/image/repositories/images.repository';
 
 @Injectable()
 export class PostsImagesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly postsImagesRepository: PostsImagesRepository) {}
 
-  getTx(
-    tx?: Prisma.TransactionClient,
-  ): PrismaService | Prisma.TransactionClient {
-    return tx ? tx : this.prisma;
-  }
-
-  async createPostImage(
-    dto: CreatePostImageDto,
-    tx?: Prisma.TransactionClient,
-  ): Promise<ImageModel> {
-    const prisma = this.getTx(tx);
+  async createPostImage(dto: CreatePostImageDto): Promise<ImageModel> {
     // dto의 image 이름을 기반으로
     // 파일의 경로를 생성한다.
     const tempFilePath = join(TEMP_FOLDER_PATH, dto.path);
@@ -42,11 +33,7 @@ export class PostsImagesService {
     const newPath = join(POST_IMAGE_PATH, fileName);
 
     // save
-    const result = await prisma.imageModel.create({
-      data: {
-        ...dto,
-      },
-    });
+    const result = await this.postsImagesRepository.create(dto);
 
     // 파일 옮기기
     await promises.rename(tempFilePath, newPath);

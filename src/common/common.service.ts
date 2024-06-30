@@ -14,7 +14,10 @@ import {
   ENV_HOST_KEY,
   ENV_PROTOCOL_KEY,
 } from 'src/common/const/env-keys.const';
-import { FindManyAggregates, FindManyArgs } from 'src/common/const/find-many-args.type';
+import {
+  FindManyAggregates,
+  FindManyArgs,
+} from 'src/common/const/find-many-args.type';
 import { OrderInputType } from 'src/common/const/order-input.type';
 import { WhereInputType } from 'src/common/const/where-input.type';
 
@@ -60,10 +63,7 @@ export class CommonService {
   ) {
     const { where, orderBy } = this.composeFindOptions<K, Y>(dto);
 
-    const [data, pageNumberMeta]: [
-      M[],
-      PageNumberPagination & PageNumberCounters,
-    ] = await prismaModel
+    return prismaModel
       .paginate({
         where,
         orderBy,
@@ -74,8 +74,6 @@ export class CommonService {
         page: dto.paginationBy as number,
         limit: dto.take,
       });
-
-    return [data, pageNumberMeta];
   }
 
   private async cursorPaginate<
@@ -89,11 +87,6 @@ export class CommonService {
     path: string,
     overrideOptions = <FindManyArgs<FindManyAggregates, M>>{},
   ) {
-    /**
-     * where__likeCount_more_than
-     *
-     * where__title__ilike
-     */
     const { where, orderBy } = this.composeFindOptions<K, Y>(dto);
 
     const { before, after } = dto.paginationBy as CursorDto;

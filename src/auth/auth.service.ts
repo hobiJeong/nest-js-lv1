@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersModel } from 'src/users/entity/users.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
@@ -9,6 +8,7 @@ import {
   ENV_HASH_ROUNDS_KEY,
   ENV_JWT_SECRET_KEY,
 } from 'src/common/const/env-keys.const';
+import { UsersModel } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -199,6 +199,8 @@ export class AuthService {
      */
     const passOk = await bcrypt.compare(user.password, existingUser.password);
 
+    console.log(existingUser);
+
     if (!passOk) {
       throw new UnauthorizedException('비밀번호가 틀렸습니다.');
     }
@@ -206,10 +208,8 @@ export class AuthService {
     return existingUser;
   }
 
-  async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
-    const existingUser = await this.authenticateWitEmailAndPassword(user);
-
-    return this.loginUser(existingUser);
+  async loginWithEmail(user: UsersModel) {
+    return this.loginUser(user);
   }
 
   async registerWithEmail(user: RegisterUserDto) {

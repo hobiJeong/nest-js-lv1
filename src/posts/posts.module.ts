@@ -8,9 +8,11 @@ import { UsersModule } from 'src/users/users.module';
 import { CommonModule } from 'src/common/common.module';
 
 import { ImageModel } from 'src/common/entity/image.entity';
-import { PostsImagesService } from 'src/posts/image/images.service';
 import { SERVICE_TOKEN } from 'src/common/guard/is-mine-or-admin.guard';
 import { PrismaModule } from 'src/prisma/prisma.module';
+import { PostsImagesService } from 'src/posts/image/services/images.service';
+import { PostsRepository } from 'src/posts/repositories/posts.repository';
+import { PostsImagesRepository } from 'src/posts/image/repositories/images.repository';
 
 /**
  * TypeORM 모델과 연동이 되는 레포지터리의 모듈을 import 해줘야 주입 가능. --> forFeature
@@ -28,6 +30,8 @@ import { PrismaModule } from 'src/prisma/prisma.module';
     PostsService,
     PostsImagesService,
     { provide: SERVICE_TOKEN, useClass: PostsService },
+    PostsRepository,
+    PostsImagesRepository,
   ],
   exports: [PostsService],
 })

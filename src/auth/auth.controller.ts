@@ -47,10 +47,7 @@ export class AuthController {
   @IsPublic()
   @UseGuards(BasicTokenGuard)
   postLoginEmail(@User() user: UsersModel) {
-    return this.authService.loginWithEmail({
-      email: user.email,
-      password: user.password,
-    });
+    return this.authService.loginWithEmail(user);
   }
 
   @Post('register/email')

@@ -22,6 +22,7 @@ import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const/roles.const';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
 import { IsMineOrAdminGuard } from 'src/common/guard/is-mine-or-admin.guard';
+import { Transactional } from '@nestjs-cls/transactional';
 
 /**
  * author: string;
@@ -40,8 +41,7 @@ export class PostsController {
   @Get()
   @IsPublic()
   @UseInterceptors(LogInterceptor)
-  getPosts(@Query() query: PaginatePostDto) {
-    // return this.postsService.getAllPosts();
+  async getPosts(@Query() query: PaginatePostDto) {
     return this.postsService.paginatePosts(query);
   }
 
@@ -54,6 +54,7 @@ export class PostsController {
     return this.postsService.getPostById(id);
   }
 
+  @Transactional()
   @Post()
   async postPosts(@User('id') userId: number, @Body() body: CreatePostDto) {
     return this.postsService.createPost(userId, body);
