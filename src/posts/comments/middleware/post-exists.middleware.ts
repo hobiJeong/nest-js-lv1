@@ -4,7 +4,7 @@ import {
   NestMiddleware,
 } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { PostsService } from 'src/posts/posts.service';
+import { PostsService } from 'src/posts/services/posts.service';
 
 @Injectable()
 export class PostsExistsMiddleware implements NestMiddleware {

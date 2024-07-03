@@ -11,7 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
+import { PostsService } from './services/posts.service';
 import { User } from 'src/users/decorator/user.decorator';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';

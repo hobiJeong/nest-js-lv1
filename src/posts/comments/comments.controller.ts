@@ -25,7 +25,7 @@ import {
 import { QR } from 'src/common/decorator/query-runner.decorator';
 import { QueryRunner } from 'typeorm';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
-import { PostsService } from 'src/posts/posts.service';
+import { PostsService } from 'src/posts/services/posts.service';
 
 @Controller('posts/:postId/comments')
 export class CommentsController {
