@@ -1,7 +1,7 @@
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Injectable } from '@nestjs/common';
-import { PostsModel } from '@prisma/client';
+import { PostsModel, Prisma } from '@prisma/client';
 import { PostCountColumn } from 'src/posts/const/post.enum';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -24,11 +24,15 @@ export class PostsRepository {
     });
   }
 
-  findUniqueById(id: number) {
+  findUniqueById(
+    id: number,
+    overrideOptions: Partial<Prisma.PostsModelFindUniqueArgs> = {},
+  ) {
     return this.txHost.tx.postsModel.findUnique({
       where: {
         id,
       },
+      ...overrideOptions,
     });
   }
 

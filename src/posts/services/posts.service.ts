@@ -36,7 +36,6 @@ export class PostsService {
     }
   }
 
-  @Transactional()
   async paginatePosts(dto: PaginatePostDto) {
     return this.commonService.paginate<
       PaginatePostDto,
@@ -48,10 +47,7 @@ export class PostsService {
   }
 
   async getPostById(id: number): Promise<PostsModel> {
-    const post = await this.prisma.postsModel.findUnique({
-      where: {
-        id,
-      },
+    const post = await this.postsRepository.findUniqueById(id, {
       include: {
         author: true,
       },
