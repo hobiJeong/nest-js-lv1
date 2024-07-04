@@ -199,8 +199,6 @@ export class AuthService {
      */
     const passOk = await bcrypt.compare(user.password, existingUser.password);
 
-    console.log(existingUser);
-
     if (!passOk) {
       throw new UnauthorizedException('비밀번호가 틀렸습니다.');
     }

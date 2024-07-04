@@ -11,9 +11,9 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { PostsService } from './services/posts.service';
+
 import { User } from 'src/users/decorator/user.decorator';
-import { CreatePostDto } from 'src/posts/dto/create-post.dto';
+
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UsersModel } from 'src/users/entity/users.entity';
@@ -23,6 +23,8 @@ import { RolesEnum } from 'src/users/const/roles.const';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
 import { IsMineOrAdminGuard } from 'src/common/guard/is-mine-or-admin.guard';
 import { Transactional } from '@nestjs-cls/transactional';
+import { PostsService } from 'src/posts/services/posts.service';
+import { CreatePostAndImagesDto } from 'src/posts/dto/create-post-and-images.dto';
 
 /**
  * author: string;
@@ -56,7 +58,10 @@ export class PostsController {
 
   @Transactional()
   @Post()
-  async postPosts(@User('id') userId: number, @Body() body: CreatePostDto) {
+  async postPosts(
+    @User('id') userId: number,
+    @Body() body: CreatePostAndImagesDto,
+  ) {
     return this.postsService.createPost(userId, body);
   }
 

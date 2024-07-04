@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { PostsService } from './services/posts.service';
-import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PostsModel } from 'src/posts/entity/posts.entity';
 import { AuthModule } from 'src/auth/auth.module';
@@ -13,6 +12,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { PostsImagesService } from 'src/posts/image/services/images.service';
 import { PostsRepository } from 'src/posts/repositories/posts.repository';
 import { PostsImagesRepository } from 'src/posts/image/repositories/images.repository';
+import { PostsController } from 'src/posts/controllers/posts.controller';
 
 /**
  * TypeORM 모델과 연동이 되는 레포지터리의 모듈을 import 해줘야 주입 가능. --> forFeature
