@@ -1,18 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { CommonService } from 'src/common/common.service';
-import { CreatePostDto } from 'src/posts/dto/create-post.dto';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { $Enums, PostsModel, Prisma } from '@prisma/client';
+import { $Enums, PostsModel, UsersModel } from '@prisma/client';
 
 import { plainToInstance } from 'class-transformer';
 import type { PostWithAuthorAndImages } from 'src/posts/type/post.type';
 import { PostImageModel } from 'src/common/entity/image.model';
 import { PostsPaginateFindManyArgs } from 'src/common/const/find-many-args.type';
 import { PostsImagesService } from 'src/posts/image/services/images.service';
+import { CreatePostAndImagesDto } from 'src/posts/dto/create-post-and-images.dto';
+import { PostsRepository } from 'src/posts/repositories/posts.repository';
+import { Transactional } from '@nestjs-cls/transactional';
+import { PostCountColumn } from 'src/posts/const/post.enum';
 
 @Injectable()
 export class PostsService {
@@ -20,13 +23,8 @@ export class PostsService {
     private readonly commonService: CommonService,
     private readonly prisma: PrismaService,
     private readonly postsImagesService: PostsImagesService,
+    private readonly postsRepository: PostsRepository,
   ) {}
-
-  getTx(
-    tx?: Prisma.TransactionClient,
-  ): Prisma.TransactionClient | PrismaService {
-    return tx ? tx : this.prisma;
-  }
 
   async generatePosts(userId: number) {
     for (let i = 0; i < 100; i++) {
@@ -38,6 +36,7 @@ export class PostsService {
     }
   }
 
+  @Transactional()
   async paginatePosts(dto: PaginatePostDto) {
     return this.commonService.paginate<
       PaginatePostDto,
@@ -65,85 +64,54 @@ export class PostsService {
     return post;
   }
 
-  async incrementCommentCount(postId: number, tx?: Prisma.TransactionClient) {
-    const prisma = this.getTx(tx);
-
-    await prisma.postsModel.update({
-      where: {
-        id: postId,
-      },
-      data: {
-        commentCount: {
-          increment: 1,
-        },
-      },
-    });
+  @Transactional()
+  incrementCommentCount(postId: number) {
+    return this.postsRepository.increment(postId, PostCountColumn.CommentCount);
   }
 
-  async decrementCommentCount(postId: number, tx?: Prisma.TransactionClient) {
-    const prisma = this.getTx(tx);
-
-    await prisma.postsModel.update({
-      where: {
-        id: postId,
-      },
-      data: {
-        commentCount: {
-          decrement: 1,
-        },
-      },
-    });
+  @Transactional()
+  decrementCommentCount(postId: number) {
+    return this.postsRepository.decrement(postId, PostCountColumn.LikeCount);
   }
 
+  @Transactional()
   async createPost(
     authorId: number,
-    postDto: CreatePostDto,
+    postDto: CreatePostAndImagesDto,
   ): Promise<PostWithAuthorAndImages> {
-    return this.prisma.$transaction(async (tx) => {
-      const { images, ...postProps } = postDto;
+    const { images, ...postProps } = postDto;
 
-      const post = await tx.postsModel.create({
-        data: { authorId, ...postProps, likeCount: 0, commentCount: 0 },
-        include: { author: true },
-      });
+    const newPost = await this.postsRepository.create({
+      authorId,
+      ...postProps,
+    });
 
-      const imagesModel: PostImageModel[] = [];
+    const imagesModel: PostImageModel[] = [];
 
-      if (images.length) {
-        for (let i = 0; i < postDto.images.length; i++) {
-          const image = await this.postsImagesService.createPostImage(
-            {
-              postId: post.id,
-              order: i,
-              path: postDto.images[i],
-              type: $Enums.ImageType.POST,
-            },
-            tx,
-          );
+    if (images.length) {
+      await Promise.all(
+        images.map(async (el, index) => {
+          const image = await this.postsImagesService.createPostImage({
+            postId: newPost.id,
+            order: index,
+            path: postDto.images[index],
+            type: $Enums.ImageType.POST,
+          });
 
           imagesModel.push(plainToInstance(PostImageModel, image));
-        }
-      }
+        }),
+      );
+    }
 
-      post['imageModel'] = imagesModel;
+    newPost['imageModel'] = imagesModel;
 
-      return post as PostWithAuthorAndImages;
-    });
+    return newPost as PostWithAuthorAndImages;
   }
 
   async updatePost(postId: number, postDto: UpdatePostDto) {
     const { title, content } = postDto;
 
-    /**
-     * save의 기능
-     * 1) 만약에 데이터가 존재하지 않는다면 (id 기준으로) 새로 생성한다.
-     * 2) 만약에 데이터가 존재한다면 (같은 id의 값이 존재한다면) 존재하던 값을 업데이트한다.(save 메서드에 id를 넣으면 조회를 먼저 함)
-     */
-    const post = await this.prisma.postsModel.findUnique({
-      where: {
-        id: postId,
-      },
-    });
+    const post = await this.postsRepository.findUniqueById(postId);
 
     if (!post) {
       throw new NotFoundException();
@@ -157,20 +125,13 @@ export class PostsService {
       post.content = content;
     }
 
-    const newPost = await this.prisma.chatsModel.update({
-      data: { ...post },
-      where: { id: post.id },
+    return this.postsRepository.update({
+      ...post,
     });
-
-    return newPost;
   }
 
   async deletePost(postId: number) {
-    const post = await this.prisma.chatsModel.findUnique({
-      where: {
-        id: postId,
-      },
-    });
+    const post = await this.postsRepository.findUniqueById(postId);
 
     if (!post) {
       throw new NotFoundException();
@@ -181,19 +142,14 @@ export class PostsService {
     return postId;
   }
 
-  checkPostExistsById(id: number) {
-    return this.prisma.chatsModel.findUnique({ where: { id } });
+  checkPostExistsById(id: number): Promise<PostsModel> {
+    return this.postsRepository.findUniqueById(id);
   }
 
-  async isPostMine(userId: number, postId: number) {
-    return this.prisma.postsModel.findUnique({
-      where: {
-        id: postId,
-        authorId: userId,
-      },
-      include: {
-        author: true,
-      },
-    });
+  async isPostMine(
+    userId: number,
+    postId: number,
+  ): Promise<PostsModel & { author: UsersModel }> {
+    return this.postsRepository.findUniqueByIdWithAuthor(postId, userId);
   }
 }
