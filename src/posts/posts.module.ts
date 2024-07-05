@@ -1,30 +1,17 @@
 import { Module } from '@nestjs/common';
-import { PostsService } from './services/posts.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostsModel } from 'src/posts/entity/posts.entity';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
-import { CommonModule } from 'src/common/common.module';
+import { AuthModule } from '@src/auth/auth.module';
+import { CommonModule } from '@src/common/common.module';
+import { SERVICE_TOKEN } from '@src/common/guard/is-mine-or-admin.guard';
+import { PostsController } from '@src/posts/controllers/posts.controller';
+import { PostsImagesRepository } from '@src/posts/image/repositories/images.repository';
+import { PostsImagesService } from '@src/posts/image/services/images.service';
+import { PostsRepository } from '@src/posts/repositories/posts.repository';
+import { PostsService } from '@src/posts/services/posts.service';
+import { PrismaModule } from '@src/prisma/prisma.module';
+import { UsersModule } from '@src/users/users.module';
 
-import { ImageModel } from 'src/common/entity/image.entity';
-import { SERVICE_TOKEN } from 'src/common/guard/is-mine-or-admin.guard';
-import { PrismaModule } from 'src/prisma/prisma.module';
-import { PostsImagesService } from 'src/posts/image/services/images.service';
-import { PostsRepository } from 'src/posts/repositories/posts.repository';
-import { PostsImagesRepository } from 'src/posts/image/repositories/images.repository';
-import { PostsController } from 'src/posts/controllers/posts.controller';
-
-/**
- * TypeORM 모델과 연동이 되는 레포지터리의 모듈을 import 해줘야 주입 가능. --> forFeature
- */
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([PostsModel, ImageModel]),
-    AuthModule,
-    UsersModule,
-    CommonModule,
-    PrismaModule,
-  ],
+  imports: [AuthModule, UsersModule, CommonModule, PrismaModule],
   controllers: [PostsController],
   providers: [
     PostsService,
