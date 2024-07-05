@@ -40,8 +40,6 @@ import { CUSTOM_PRISMA_CLIENT, PrismaModule } from 'src/prisma/prisma.module';
 import { ClsModule } from 'nestjs-cls';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaClientExtended } from 'src/prisma/prisma-extension.service';
 
 dotenv.config();
 
@@ -125,7 +123,6 @@ dotenv.config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
-    PrismaService,
   ],
 })
 export class AppModule implements NestModule {

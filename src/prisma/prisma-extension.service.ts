@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { pagination } from 'prisma-extension-pagination';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomPrismaClient } from 'src/prisma/types/type';
 
 export const customPrismaClient = (prisma: PrismaClient) => {
@@ -18,7 +17,7 @@ export class PrismaClientExtended
   extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'error'>
   implements OnModuleInit, OnModuleDestroy
 {
-  private readonly logger = new Logger(PrismaService.name);
+  private readonly logger = new Logger(PrismaClientExtended.name);
   private customPrismaClient: CustomPrismaClient;
 
   constructor() {
