@@ -1,15 +1,19 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 
 import { UsersModel } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CUSTOM_PRISMA_CLIENT } from 'src/prisma/prisma.module';
+import { CustomPrismaClient } from 'src/prisma/types/type';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(CUSTOM_PRISMA_CLIENT) private readonly prisma: CustomPrismaClient,
+  ) {}
 
   async createUser(user: Pick<UsersModel, 'email' | 'nickname' | 'password'>) {
     // 1) nickname 중복이 없는지 확인

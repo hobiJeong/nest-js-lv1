@@ -4,12 +4,11 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
-import { PrismaClientExtended } from 'src/prisma/prisma-extension.service';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaService
-  extends PrismaClientExtended
+  extends PrismaClient<Prisma.PrismaClientOptions, 'query' | 'error'>
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaService.name);

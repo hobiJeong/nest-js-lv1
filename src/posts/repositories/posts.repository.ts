@@ -4,16 +4,17 @@ import { Injectable } from '@nestjs/common';
 import { PostsModel, Prisma } from '@prisma/client';
 import { PostCountColumn } from 'src/posts/const/post.enum';
 import { CreatePostDto } from 'src/posts/dto/create-post.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CustomPrismaClient } from 'src/prisma/types/type';
 
 @Injectable()
 export class PostsRepository {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
+    private readonly txHost: TransactionHost<
+      TransactionalAdapterPrisma<CustomPrismaClient>
+    >,
   ) {}
 
-  create(dto: CreatePostDto) {
+  async create(dto: CreatePostDto) {
     return this.txHost.tx.postsModel.create({
       data: {
         ...dto,

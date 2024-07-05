@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChatDto } from 'src/chats/dto/create-chat.dto';
 import { PaginateChatDto } from 'src/chats/dto/paginate-chat.dto';
 import { ChatsModel } from 'src/chats/entity/chats.entity';
 import { CommonService } from 'src/common/common.service';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CUSTOM_PRISMA_CLIENT } from 'src/prisma/prisma.module';
+import { CustomPrismaClient } from 'src/prisma/types/type';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -13,15 +14,11 @@ export class ChatsService {
     @InjectRepository(ChatsModel)
     private readonly chatsRepository: Repository<ChatsModel>,
     private readonly commonService: CommonService,
-    private readonly prisma: PrismaService,
+    @Inject(CUSTOM_PRISMA_CLIENT) private readonly prisma: CustomPrismaClient,
   ) {}
 
   async paginateChats(dto: PaginateChatDto) {
-    return this.commonService.paginate(
-      dto,
-      this.prisma.client.chatsModel,
-      'chats',
-    );
+    return this.commonService.paginate(dto, this.prisma.chatsModel, 'chats');
   }
 
   async createChat(dto: CreateChatDto) {

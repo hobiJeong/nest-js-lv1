@@ -21,7 +21,10 @@ import { LogInterceptor } from 'src/common/interceptor/log.interceptor';
 import { Roles } from 'src/users/decorator/roles.decorator';
 import { RolesEnum } from 'src/users/const/roles.const';
 import { IsPublic } from 'src/common/decorator/is-public.decorator';
-import { IsMineOrAdminGuard } from 'src/common/guard/is-mine-or-admin.guard';
+import {
+  IsMineOrAdminGuard,
+  SetParamsToken,
+} from 'src/common/guard/is-mine-or-admin.guard';
 import { Transactional } from '@nestjs-cls/transactional';
 import { PostsService } from 'src/posts/services/posts.service';
 import { CreatePostAndImagesDto } from 'src/posts/dto/create-post-and-images.dto';
@@ -76,6 +79,7 @@ export class PostsController {
   // 4) PATCH /posts/:id
   //    id에 해당하는 POST를 변경한다.
   @Patch(':postId')
+  @SetParamsToken('postId')
   @UseGuards(IsMineOrAdminGuard)
   patchPost(
     @Param('postId', ParseIntPipe) id: number,

@@ -1,11 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import { CommonService } from 'src/common/common.service';
 import { PaginatePostDto } from 'src/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from 'src/posts/dto/update-post.dto';
 
-import { PrismaService } from 'src/prisma/prisma.service';
-import { $Enums, PostsModel, UsersModel } from '@prisma/client';
+import { $Enums, PostsModel } from '@prisma/client';
 
 import { plainToInstance } from 'class-transformer';
 import type { PostWithAuthorAndImages } from 'src/posts/type/post.type';
@@ -16,12 +15,15 @@ import { CreatePostAndImagesDto } from 'src/posts/dto/create-post-and-images.dto
 import { PostsRepository } from 'src/posts/repositories/posts.repository';
 import { Transactional } from '@nestjs-cls/transactional';
 import { PostCountColumn } from 'src/posts/const/post.enum';
+import { RequiredMethod } from 'src/common/guard/is-mine-or-admin.guard';
+import { CustomPrismaClient } from 'src/prisma/types/type';
+import { CUSTOM_PRISMA_CLIENT } from 'src/prisma/prisma.module';
 
 @Injectable()
-export class PostsService {
+export class PostsService implements RequiredMethod {
   constructor(
     private readonly commonService: CommonService,
-    private readonly prisma: PrismaService,
+    @Inject(CUSTOM_PRISMA_CLIENT) private readonly prisma: CustomPrismaClient,
     private readonly postsImagesService: PostsImagesService,
     private readonly postsRepository: PostsRepository,
   ) {}
@@ -41,7 +43,7 @@ export class PostsService {
       PaginatePostDto,
       PostsModel,
       PostsPaginateFindManyArgs
-    >(dto, this.prisma.client.postsModel, 'posts', {
+    >(dto, this.prisma.postsModel, 'posts', {
       include: { author: true, imageModel: true },
     });
   }
@@ -142,10 +144,12 @@ export class PostsService {
     return this.postsRepository.findUniqueById(id);
   }
 
-  async isPostMine(
-    userId: number,
-    postId: number,
-  ): Promise<PostsModel & { author: UsersModel }> {
-    return this.postsRepository.findUniqueByIdWithAuthor(postId, userId);
+  async isMine(userId: number, id: number): Promise<boolean> {
+    const posts = await this.postsRepository.findUniqueByIdWithAuthor(
+      id,
+      userId,
+    );
+
+    return Boolean(posts);
   }
 }

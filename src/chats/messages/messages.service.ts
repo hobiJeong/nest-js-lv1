@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateMessagesDto } from 'src/chats/messages/dto/create-messages.dto';
 import { MessagesModel } from 'src/chats/messages/entity/messages.entity';
 import { CommonService } from 'src/common/common.service';
 import { BasePaginationDto } from 'src/common/dto/base-pagination.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CUSTOM_PRISMA_CLIENT } from 'src/prisma/prisma.module';
+import { CustomPrismaClient } from 'src/prisma/types/type';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class ChatsMessagesService {
     @InjectRepository(MessagesModel)
     private readonly messagesRepository: Repository<MessagesModel>,
     private readonly commonService: CommonService,
-    private readonly prisma: PrismaService,
+    @Inject(CUSTOM_PRISMA_CLIENT) private readonly prisma: CustomPrismaClient,
   ) {}
 
   async createMessage(dto: CreateMessagesDto, authorId: number) {
@@ -40,7 +41,7 @@ export class ChatsMessagesService {
   paginateMessages(dto: BasePaginationDto) {
     return this.commonService.paginate(
       dto,
-      this.prisma.client.messagesModel,
+      this.prisma.messagesModel,
       'messages',
     );
   }

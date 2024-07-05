@@ -41,6 +41,7 @@ import { ClsModule } from 'nestjs-cls';
 import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaClientExtended } from 'src/prisma/prisma-extension.service';
 
 dotenv.config();
 
@@ -101,7 +102,7 @@ dotenv.config();
         new ClsPluginTransactional({
           imports: [PrismaModule],
           adapter: new TransactionalAdapterPrisma({
-            prismaInjectionToken: PrismaService,
+            prismaInjectionToken: CUSTOM_PRISMA_CLIENT,
           }),
         }),
       ],

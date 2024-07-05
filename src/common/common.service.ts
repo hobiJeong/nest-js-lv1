@@ -5,11 +5,7 @@ import {
   Paginator,
   PaginatorOptions,
 } from 'prisma-extension-pagination/dist/extension';
-import {
-  CursorPaginationMeta,
-  PageNumberCounters,
-  PageNumberPagination,
-} from 'prisma-extension-pagination/dist/types';
+import { CursorPaginationMeta } from 'prisma-extension-pagination/dist/types';
 import {
   ENV_HOST_KEY,
   ENV_PROTOCOL_KEY,

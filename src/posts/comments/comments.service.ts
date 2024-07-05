@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { DEFAULT_COMMENT_FIND_OPTIONS } from 'src/posts/comments/const/default-comment-find-options.const';
@@ -6,7 +6,8 @@ import { CreateCommentDto } from 'src/posts/comments/dto/create-comment.dto';
 import { PaginateCommentsDto } from 'src/posts/comments/dto/paginate-comments.dto';
 import { UpdateCommentDto } from 'src/posts/comments/dto/update-comment.dto';
 import { CommentsModel } from 'src/posts/comments/entity/comments.entity';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { CUSTOM_PRISMA_CLIENT } from 'src/prisma/prisma.module';
+import { CustomPrismaClient } from 'src/prisma/types/type';
 import { UsersModel } from 'src/users/entity/users.entity';
 import { QueryRunner, Repository } from 'typeorm';
 
@@ -16,7 +17,7 @@ export class CommentsService {
     @InjectRepository(CommentsModel)
     private readonly commentsRepository: Repository<CommentsModel>,
     private readonly commonService: CommonService,
-    private readonly prisma: PrismaService,
+    @Inject(CUSTOM_PRISMA_CLIENT) private readonly prisma: CustomPrismaClient,
   ) {}
 
   getRepository(qr?: QueryRunner) {
@@ -28,7 +29,7 @@ export class CommentsService {
   paginateComments(dto: PaginateCommentsDto, postId: number) {
     return this.commonService.paginate(
       dto,
-      this.prisma.client.commentsModel,
+      this.prisma.commentsModel,
       `posts/${postId}/comments`,
     );
   }
