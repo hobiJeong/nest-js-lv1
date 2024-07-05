@@ -13,6 +13,6 @@ export const CUSTOM_PRISMA_CLIENT = Symbol('CUSTOM_PRISMA_CLIENT');
       inject: [PrismaClientExtended],
     },
   ],
-  exports: [PrismaClientExtended, CUSTOM_PRISMA_CLIENT],
+  exports: [CUSTOM_PRISMA_CLIENT],
 })
 export class PrismaModule {}
