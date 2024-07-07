@@ -3,8 +3,8 @@ import {
   ArgumentInvalidException,
   ArgumentOutOfRangeException,
 } from '@src/libs/exceptions/exceptions';
-import { Guard } from '../guard';
-import { convertPropsToObject } from '../utils';
+import { Guard } from '@src/libs/guard';
+import { convertPropsToObject } from '@src/libs/utils/convert-props-to-object.util';
 
 export type AggregateID = string;
 
