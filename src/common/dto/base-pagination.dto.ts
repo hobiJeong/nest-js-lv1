@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { IsNumber, IsOptional, IsIn, IsEnum } from 'class-validator';
+import { IsNumber, IsOptional, IsEnum } from 'class-validator';
 import { Pagination } from 'src/common/decorator/pagination.decorator';
 import { CursorDto } from 'src/common/dto/cursor.dto';
 

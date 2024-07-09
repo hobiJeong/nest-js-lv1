@@ -18,6 +18,7 @@ import { ZodTypeAny, TypeOf, ZodObject } from 'zod';
 import { LoggerPort } from '../ports/logger.port';
 import { ObjectLiteral } from '../types';
 import { RequestContextService } from '@src/libs/application/context/app-request.context';
+import { ConflictException } from '@src/libs/exceptions/exceptions';
 
 export abstract class SqlRepositoryBase<
   Aggregate extends AggregateRoot<any>,

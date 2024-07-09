@@ -11,6 +11,7 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { UsersModel } from '@prisma/client';
+import { isNil } from '@src/common/common';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { ChatsService } from 'src/chats/chats.service';
@@ -62,8 +63,8 @@ export class ChatsGateway
 
     const rawToken = headers['authorization'];
 
-    if (!rawToken) {
-      socket.disconnect();
+    if (isNil(rawToken)) {
+      return socket.disconnect();
     }
 
     try {
@@ -92,10 +93,7 @@ export class ChatsGateway
   )
   @UseFilters(SocketCatchHttpExceptionFilter)
   @SubscribeMessage('create_chat')
-  async createChat(
-    @MessageBody() data: CreateChatDto,
-    @ConnectedSocket() socket: Socket & { user: UsersModel },
-  ) {
+  async createChat(@MessageBody() data: CreateChatDto) {
     const chat = await this.chatsService.createChat(data);
   }
 

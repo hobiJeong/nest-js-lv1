@@ -42,7 +42,7 @@ export class PrismaClientExtended
       ],
     });
 
-    this.$on<any>('query', (event: Prisma.QueryEvent) => {
+    this.$on<'query'>('query', (event: Prisma.QueryEvent) => {
       const { query, params, duration } = event;
 
       if (['COMMIT', 'BEGIN', 'ROLLBACK'].includes(query)) {
