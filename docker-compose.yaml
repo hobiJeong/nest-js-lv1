@@ -8,15 +8,15 @@ services:
     # 그렇기 때문에 도커를 종료시키면 이미지 내의 파일들이 다 날아감.
     # 그래서 postgresql 안에 저장해놨던 데이터를 실제 Host OS의 볼륨과 매핑을 해줄 것.
     volumes:
-    # :를 기준으로 왼쪽은 Host OS의 경로. 오른쪽은 이미지 내부의 경로
-    # 즉 Host OS의 경로인 ./postgres-data 폴더와 이미지 내부의 존재하는 폴더인
-    # /var/lib/postgresql/data와 싱크를 맞춰주겠다는 뜻.
+      # :를 기준으로 왼쪽은 Host OS의 경로. 오른쪽은 이미지 내부의 경로
+      # 즉 Host OS의 경로인 ./postgres-data 폴더와 이미지 내부의 존재하는 폴더인
+      # /var/lib/postgresql/data와 싱크를 맞춰주겠다는 뜻.
       - ./postgres-data:/var/lib/postgresql/data
     # 이미지 내의 포트와 현재 Host OS의 포트를 매핑
     # 이렇게 하면 postgres 서비스를 실행했을 때 host에서 5432포트에 요청을 넣게 되면
     # 그 요청은 postgres 서비스의 이미지의 5432 포트로 요청이 넘어가게 됨.
-    ports: 
-      - "5432:5432"
+    ports:
+      - '5432:5432'
     # 데이터베이스에 대한 정보를 추가로 넣어줄 수 있음
     environment:
       # postgres이미지를 띄웠을 때 기본 사용자 이름 정의

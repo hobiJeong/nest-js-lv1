@@ -21,6 +21,7 @@ export const IsPositiveIntrOrCursor = (
       propertyName: propertyName,
       options: validationOptions,
       validator: {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         async validate(value: any, _args: ValidationArguments) {
           if (isInt(value) && min(value, 1)) {
             return true;
@@ -38,6 +39,7 @@ export const IsPositiveIntrOrCursor = (
 
           return false;
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         defaultMessage(args: ValidationArguments) {
           return 'paginationBy must be either a number or a Cursor object';
         },
