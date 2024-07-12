@@ -3,10 +3,9 @@ import {
   DynamicModelExtensionThis,
   InternalArgs,
 } from '@prisma/client/runtime/library';
-import {
-  Paginator,
-  PaginatorOptions,
-} from 'prisma-extension-pagination/dist/extension';
+import { createPaginator } from 'prisma-extension-pagination/dist/extension';
+
+const paginate = createPaginator();
 
 export type ModelNames =
   | 'ChatRoom'
@@ -24,31 +23,31 @@ export type ExtendedModel<T extends ModelNames> = DynamicModelExtensionThis<
       result: Record<string, any>;
       model: {
         $allModels: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         chatRoom: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         comment: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         image: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         message: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         post: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         follow: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         user: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
         chatUser: {
-          paginate: () => Paginator<PaginatorOptions>;
+          paginate: () => typeof paginate;
         };
       };
       query: Record<string, any>;
@@ -60,31 +59,31 @@ export type ExtendedModel<T extends ModelNames> = DynamicModelExtensionThis<
     result: Record<string, any>;
     model: {
       $allModels: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       chatRoom: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       comment: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       image: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       message: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       post: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       follow: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       user: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
       chatUser: {
-        paginate: () => Paginator<PaginatorOptions>;
+        paginate: () => typeof paginate;
       };
     };
   }
