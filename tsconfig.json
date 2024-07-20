@@ -23,6 +23,7 @@
       "@libs/*": ["src/libs/*"],
       "@src/*": ["src/*"],
       "@tests/*": ["tests/*"]
-    }
+    },
+    "noErrorTruncation": false
   }
 }

@@ -1,5 +1,5 @@
 export class BaseModel {
-  id: number;
+  id: bigint;
 
   createdAt: Date;
 

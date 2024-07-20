@@ -1,11 +1,12 @@
-import { Option } from 'oxide.ts';
-
 /*  Most of repositories will probably need generic 
     save/find/delete operations, so it's easier
     to have some shared interfaces.
     More specific queries should be defined
     in a respective repository.
 */
+
+import { AggregateID } from '@libs/ddd/entity.base';
+import { SortOrder } from '@src/common/const/sort-order.enum';
 
 export class Paginated<T> {
   readonly count: number;
@@ -21,21 +22,18 @@ export class Paginated<T> {
   }
 }
 
-export type OrderBy = { field: string | true; param: 'asc' | 'desc' };
+export type OrderBy<T> = Partial<Record<keyof T, SortOrder>>[];
 
-export type PaginatedQueryParams = {
+export type PaginatedQueryParams<T, Filter> = {
   limit: number;
   page: number;
-  offset: number;
-  orderBy: OrderBy;
+  orderBy: OrderBy<T>;
+  filter: Filter;
 };
 
 export interface RepositoryPort<Entity> {
   insert(entity: Entity | Entity[]): Promise<void>;
-  findOneById(id: string): Promise<Option<Entity>>;
+  findOneById(id: bigint): Promise<Entity>;
   findAll(): Promise<Entity[]>;
-  findAllPaginated(params: PaginatedQueryParams): Promise<Paginated<Entity>>;
-  delete(entity: Entity): Promise<boolean>;
-
-  transaction<T>(handler: () => Promise<T>): Promise<T>;
+  delete(entity: Entity): Promise<AggregateID>;
 }

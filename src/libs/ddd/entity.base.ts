@@ -6,7 +6,7 @@ import {
 import { Guard } from '@src/libs/guard';
 import { convertPropsToObject } from '@src/libs/utils/convert-props-to-object.util';
 
-export type AggregateID = string;
+export type AggregateID = bigint;
 
 export interface BaseEntityProps {
   id: AggregateID;

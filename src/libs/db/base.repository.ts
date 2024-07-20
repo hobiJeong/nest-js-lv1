@@ -1,0 +1,64 @@
+import { AggregateID } from '@libs/ddd/entity.base';
+import { ExtendedModel, ModelNames } from '@libs/types/model.type';
+import { ObjectLiteral } from '@libs/types/object-literal.type';
+import { ConflictException } from '@nestjs/common';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { AggregateRoot } from '@src/libs/ddd/aggregate-root.base';
+import { Mapper } from '@src/libs/ddd/mapper.interface';
+import { RepositoryPort } from '@src/libs/ddd/repository.port';
+
+import { ZodObject } from 'zod';
+
+export abstract class BaseRepository<
+  Aggregate extends AggregateRoot<any>,
+  DbModel extends ObjectLiteral & { id: bigint },
+> implements RepositoryPort<Aggregate>
+{
+  protected abstract tableName: string;
+
+  protected abstract schema: ZodObject<any>;
+
+  protected constructor(
+    protected readonly model: ExtendedModel<ModelNames>,
+    protected readonly mapper: Mapper<Aggregate, DbModel>,
+  ) {}
+
+  async findOneById(id: bigint): Promise<Aggregate> {
+    const record = await this.model.findUnique({ where: { id } });
+
+    return record ? this.mapper.toEntity(record) : undefined;
+  }
+
+  async findAll(): Promise<Aggregate[]> {
+    const record = await this.model.findMany();
+
+    return record.map(this.mapper.toEntity);
+  }
+
+  async delete(entity: Aggregate): Promise<AggregateID> {
+    entity.validate();
+
+    const result = await this.model.delete({ where: { id: entity.id } });
+
+    return result.id;
+  }
+
+  async insert(entity: Aggregate | Aggregate[]): Promise<void> {
+    const entities = Array.isArray(entity) ? entity : [entity];
+
+    const records = entities.map(this.mapper.toPersistence);
+
+    try {
+      await this.model.createMany({
+        data: records.map((record) => record),
+      });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError) {
+        console.error(error);
+
+        throw new ConflictException('Record already exists', { cause: error });
+      }
+      throw error;
+    }
+  }
+}

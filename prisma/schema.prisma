@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["interactiveTransactions"]
 }
 
@@ -8,119 +8,127 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model ChatsModel {
-  id              Int               @id(map: "PK_2aea6cf9923f6b48da28709c9df") @default(autoincrement())
-  updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamp(6)
-  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
-  messagesModel   MessagesModel[]
-  usersChatsModel UsersChatsModel[]
+model ChatRoom {
+  id        BigInt     @id(map: "pk_chat_rooms")
+  messages  Message[]
+  chatUsers ChatUser[]
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime?  @db.Timestamptz(6)
 
-  @@map("chats_model")
+  @@map("chat_rooms")
 }
 
-model CommentsModel {
-  id         Int         @id(map: "PK_0da0a249f71e90b4948e21d4bc4") @default(autoincrement())
-  updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
-  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
-  comment    String      @db.VarChar
-  likeCount  Int         @map("like_count")
-  authorId   Int        @map("author_id")
-  postId     Int        @map("post_id")
-  usersModel UsersModel @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_26a4df66c84022300d49a4c7c8e")
-  postsModel PostsModel @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_30172445adc82b4acfa72e162ee")
+model Comment {
+  id        BigInt    @id(map: "pk_comments")
+  comment   String    @db.VarChar(255)
+  likeCount Int       @default(0) @map("like_count")
+  userId    BigInt    @map("user_id")
+  postId    BigInt    @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_comments_users")
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_comments_posts")
 
-  @@map("comments_model")
+  @@map("comments")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model ImageModel {
-  id         Int         @id(map: "PK_05aa8703890985ec0bb38428699") @default(autoincrement())
-  updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
-  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
-  order      Int         @default(0)
-  type       ImageType
-  path       String      @db.VarChar
-  postId     Int?        @map("post_id")
-  postsModel PostsModel? @relation(fields: [postId], references: [id], onDelete: Cascade, map: "FK_40cd89c6655ec7b102842feacab")
+model Image {
+  id        BigInt    @id(map: "pk_images")
+  order     Int       @default(0)
+  type      ImageType
+  path      String    @db.VarChar(255)
+  postId    BigInt?   @map("post_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+  post      Post?     @relation(fields: [postId], references: [id], onDelete: Cascade, map: "fk_images_posts")
 
-  @@map("image_model")
+  @@map("images")
 }
 
-model MessagesModel {
-  id         Int         @id(map: "PK_0f7c1e4adf172209f286cfcae2f") @default(autoincrement())
-  updatedAt  DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
-  createdAt  DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
-  message    String      @db.VarChar
-  chatId     Int        @map("chat_id")
-  authorId   Int        @map("author_id")
-  author     UsersModel? @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_65a138da666c7f41f44c7c22206")
-  chatsModel ChatsModel? @relation(fields: [chatId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ea3803c31ed7eccb4aca9416504")
+model Message {
+  id         BigInt    @id(map: "pk_messages")
+  message    String    @db.VarChar(255)
+  chatRoomId BigInt    @map("chat_room_id")
+  userId     BigInt    @map("user_id")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @db.Timestamptz(6)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_messages_users")
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_messages_chat_rooms")
 
-  @@map("messages_model")
+  @@map("messages")
 }
 
-model PostsModel {
-  id            Int             @id(map: "PK_d70f19613eb641c94bb122c4397") @default(autoincrement())
-  title         String          @db.VarChar
-  content       String          @db.VarChar
-  likeCount     Int             
-  commentCount  Int
-  authorId      Int
-  updatedAt     DateTime        @default(now()) @db.Timestamp(6)
-  createdAt     DateTime        @default(now()) @db.Timestamp(6)
-  commentsModel CommentsModel[]
-  imageModel    ImageModel[]
-  author        UsersModel      @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_c8b7f084ae29a7104846f1bec05")
+model Post {
+  id           BigInt    @id(map: "pk_posts")
+  title        String    @db.VarChar(255)
+  content      String
+  likeCount    Int       @default(0)
+  commentCount Int       @default(0)
+  userId       BigInt
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime? @db.Timestamptz(6)
+  comments     Comment[]
+  images       Image[]
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_posts_users")
 
-  @@map("posts_model")
+  @@map("posts")
 }
 
-model UserFollowersModel {
-  id          Int         @id(map: "PK_567b39f0fb420f63ef11095f474") @default(autoincrement())
-  updatedAt   DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
-  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
-  isConfirmed Boolean     @default(false)
-  followerId  Int        @map("follower_id")
-  followeeId  Int        @map("followee_id")
-  followee    UsersModel @relation("followee_id", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_7c12be097b786317829ba012ba0")
-  follower    UsersModel @relation("follower_id", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_dccf79aa2a78b614aae3401eef2")
+model Follow {
+  id          BigInt    @id(map: "pk_follows")
+  isConfirmed Boolean   @default(false)
+  followerId  BigInt    @map("follower_id")
+  followeeId  BigInt    @map("followee_id")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt   DateTime? @db.Timestamptz(6)
+  followee    User      @relation("followee_id", fields: [followeeId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_follows_users_followee")
+  follower    User      @relation("follower_id", fields: [followerId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_follows_users_follower")
 
-  @@map("user_followers_model")
+  @@map("follows")
 }
 
-model UsersModel {
-  id              Int                  @id(map: "PK_1355f66d5ebddb2449c566571c8") @default(autoincrement())
-  nickname        String               @unique(map: "UQ_cf2c74837f74a2d823d330293a4") @db.VarChar(20)
-  email           String               @unique(map: "UQ_d3129562d6ac1c574e5e909e4ed") @db.VarChar
-  password        String               @db.VarChar
-  role            UsersModelRoleEnum   @default(USER)
-  updatedAt       DateTime             @default(now()) @map("updated_at") @db.Timestamp(6)
-  createdAt       DateTime             @default(now()) @map("created_at") @db.Timestamp(6)
-  followerCount   Int                  @default(0) @map("follower_count")
-  followeeCount   Int                  @default(0) @map("followee_count")
-  commentsModel   CommentsModel[]
-  messages        MessagesModel[]
-  postsModel      PostsModel[]
-  followees       UserFollowersModel[] @relation("followee_id")
-  followers       UserFollowersModel[] @relation("follower_id")
-  usersChatsModel UsersChatsModel[]
+model User {
+  id            BigInt       @id(map: "pk_users")
+  nickname      String       @unique(map: "uq_users_nickname") @db.VarChar(20)
+  email         String       @unique(map: "uq_users_email") @db.VarChar(255)
+  password      String       @db.VarChar(255)
+  role          UserRoleEnum @default(USER)
+  followerCount Int          @default(0) @map("follower_count")
+  followeeCount Int          @default(0) @map("followee_count")
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt     DateTime?    @db.Timestamptz(6)
+  comments      Comment[]
+  messages      Message[]
+  posts         Post[]
+  followees     Follow[]     @relation("followee_id")
+  followers     Follow[]     @relation("follower_id")
+  chatUsers     ChatUser[]
 
   @@map("users_model")
 }
 
-model UsersChatsModel {
-  usersModelId Int        @map("users_model_id")
-  chatsModelId Int        @map("chats_model_id")
-  usersModel   UsersModel @relation(fields: [usersModelId], references: [id], onDelete: Cascade, map: "FK_6d8216f552d980bdaa2bae7e93d")
-  chatsModel   ChatsModel @relation(fields: [chatsModelId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "FK_81161993d9b420943ac1c494525")
+model ChatUser {
+  id         BigInt    @id(map: "pk_chat_users")
+  userId     BigInt    @map("users_id")
+  chatRoomId BigInt    @map("chats_id")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_chat_users_users")
+  chatRoom   ChatRoom  @relation(fields: [chatRoomId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "fk_chat_users_chat_rooms")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @db.Timestamptz(6)
 
-  @@id([usersModelId, chatsModelId], map: "PK_5bb92fb95e42ac2b6b778ce87dc")
-  @@index([usersModelId], map: "IDX_6d8216f552d980bdaa2bae7e93")
-  @@index([chatsModelId], map: "IDX_81161993d9b420943ac1c49452")
-  @@map("users_chats_model")
+  @@map("chat_users")
 }
 
-enum UsersModelRoleEnum {
+enum UserRoleEnum {
   ADMIN
   USER
 }

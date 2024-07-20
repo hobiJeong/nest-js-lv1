@@ -772,6 +772,13 @@
     path-to-regexp "3.2.0"
     tslib "2.6.2"
 
+"@nestjs/cqrs@^10.2.7":
+  version "10.2.7"
+  resolved "https://registry.yarnpkg.com/@nestjs/cqrs/-/cqrs-10.2.7.tgz#67e129d481c86a2b3153374af688abfd19819994"
+  integrity sha512-RXhgQOfuT+KzvkueR4S++SB6+6333PL71pOtCzbJAAU/DY3KY56yTCncWRsIdorKfDX5AEwTiQHHJi69XJWdkA==
+  dependencies:
+    uuid "9.0.1"
+
 "@nestjs/event-emitter@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@nestjs/event-emitter/-/event-emitter-2.0.4.tgz#de7d3986cfeb82639bb95181fab4fe5525437c74"
@@ -5457,6 +5464,11 @@ tsconfig-paths@4.2.0, tsconfig-paths@^4.1.2, tsconfig-paths@^4.2.0:
     json5 "^2.2.2"
     minimist "^1.2.6"
     strip-bom "^3.0.0"
+
+tsid-ts@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/tsid-ts/-/tsid-ts-0.0.9.tgz#2fc486ee1b414d070f751510f6ab67a92d4ea0db"
+  integrity sha512-UQtHUWLO65lUht9m3Iy9iO7fxy1197L3CWEWP19VMCUpMZ548LSuWaTaLIL7NKdiWRJ6z7HJeuAJoVJ29NllnA==
 
 tslib@2.6.2, tslib@^2.1.0, tslib@^2.5.0, tslib@^2.6.2:
   version "2.6.2"

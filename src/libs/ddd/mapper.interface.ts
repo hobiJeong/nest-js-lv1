@@ -1,11 +1,11 @@
 import { Entity } from './entity.base';
 
 export interface Mapper<
-  DomainEntity extends Entity<any>,
+  DomainEntity extends Entity<unknown>,
   DbRecord,
-  Response = any,
+  ResponseDto = unknown,
 > {
   toPersistence(entity: DomainEntity): DbRecord;
-  toDomain(record: any): DomainEntity;
-  toResponse(entity: DomainEntity): Response;
+  toEntity(record: unknown): DomainEntity;
+  toResponseDto(entity: DomainEntity): ResponseDto;
 }
