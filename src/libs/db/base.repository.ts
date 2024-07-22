@@ -2,6 +2,7 @@ import { AggregateID } from '@libs/ddd/entity.base';
 import { ExtendedModel, ModelNames } from '@libs/types/model.type';
 import { ObjectLiteral } from '@libs/types/object-literal.type';
 import { ConflictException } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AggregateRoot } from '@src/libs/ddd/aggregate-root.base';
 import { Mapper } from '@src/libs/ddd/mapper.interface';
@@ -21,6 +22,7 @@ export abstract class BaseRepository<
   protected constructor(
     protected readonly model: ExtendedModel<ModelNames>,
     protected readonly mapper: Mapper<Aggregate, DbModel>,
+    protected readonly eventBus: EventBus,
   ) {}
 
   async findOneById(id: bigint): Promise<Aggregate> {
@@ -40,6 +42,8 @@ export abstract class BaseRepository<
 
     const result = await this.model.delete({ where: { id: entity.id } });
 
+    await entity.publishEvents(this.eventBus);
+
     return result.id;
   }
 
@@ -52,6 +56,12 @@ export abstract class BaseRepository<
       await this.model.createMany({
         data: records.map((record) => record),
       });
+
+      await Promise.all(
+        entities.map(
+          async (entity) => await entity.publishEvents(this.eventBus),
+        ),
+      );
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
         console.error(error);

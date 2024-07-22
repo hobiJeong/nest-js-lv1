@@ -28,9 +28,11 @@ export abstract class AggregateRoot<EntityProps> extends Entity<EntityProps> {
             this.id
           }`,
         );
+
         return eventBus.publish(event);
       }),
     );
+
     this.clearEvents();
   }
 }
