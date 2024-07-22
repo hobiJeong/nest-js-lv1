@@ -1,7 +1,7 @@
 import { AggregateID } from '@libs/ddd/entity.base';
+import { ConflictException } from '@libs/exceptions/exceptions';
 import { ExtendedModel, ModelNames } from '@libs/types/model.type';
 import { ObjectLiteral } from '@libs/types/object-literal.type';
-import { ConflictException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AggregateRoot } from '@src/libs/ddd/aggregate-root.base';
@@ -66,7 +66,7 @@ export abstract class BaseRepository<
       if (error instanceof PrismaClientKnownRequestError) {
         console.error(error);
 
-        throw new ConflictException('Record already exists', { cause: error });
+        throw new ConflictException('Record already exists', error);
       }
       throw error;
     }
