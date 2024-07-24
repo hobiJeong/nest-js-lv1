@@ -26,7 +26,7 @@ export type ExtendedModel<T extends ModelNames> = DynamicModelExtensionThis<
         $allModels: {
           paginate: () => Paginator<PaginatorOptions>;
         };
-        chat: {
+        chatRoom: {
           paginate: () => Paginator<PaginatorOptions>;
         };
         comment: {
@@ -62,7 +62,7 @@ export type ExtendedModel<T extends ModelNames> = DynamicModelExtensionThis<
       $allModels: {
         paginate: () => Paginator<PaginatorOptions>;
       };
-      chat: {
+      chatRoom: {
         paginate: () => Paginator<PaginatorOptions>;
       };
       comment: {

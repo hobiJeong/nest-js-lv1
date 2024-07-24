@@ -1,23 +1,26 @@
 import { AggregateRoot } from '@libs/ddd/aggregate-root.base';
-import { AggregateID } from '@libs/ddd/entity.base';
-import { ImageEntity } from '@src/apis/image/domain/images.entity';
-import { PostProps } from '@src/apis/posts/types/post.type';
+import { PostCreatedDomainEvent } from '@src/apis/posts/domain/events/post-created.event';
+import { CreatePostProps, PostProps } from '@src/apis/posts/types/post.type';
+import { getTsid } from 'tsid-ts';
 
 export class PostEntity extends AggregateRoot<PostProps> {
-  protected _id: AggregateID;
+  static create(create: CreatePostProps) {
+    const id = getTsid().toBigInt();
 
-  title: string;
+    const props: PostProps = {
+      ...create,
+      likeCount: 0,
+      commentCount: 0,
+    };
+    const post = new PostEntity({ id, props });
 
-  content: string;
-
-  likeCount: number;
-
-  commentCount: number;
-
-  author: UsersModel;
-
-  images: ImageEntity[];
-  comments: CommentsModel[];
+    post.addEvent(
+      new PostCreatedDomainEvent({
+        aggregateId: id,
+        ...props,
+      }),
+    );
+  }
 
   public validate(): void {}
 }

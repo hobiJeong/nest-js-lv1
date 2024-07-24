@@ -1,18 +1,19 @@
+import { AggregateID } from '@libs/ddd/entity.base';
 import { ObjectLiteral } from '@libs/types/object-literal.type';
 
-export class PostsModel implements ObjectLiteral {
+export class PostModel implements ObjectLiteral {
   [key: string]: unknown;
 
-  id: bigint;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-  userId: bigint;
-  createdAt: Date;
-  updatedAt: Date;
+  readonly id: AggregateID;
+  readonly title: string;
+  readonly content: string;
+  readonly likeCount: number;
+  readonly commentCount: number;
+  readonly userId: AggregateID;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
 
-  constructor(create: PostsModel) {
+  constructor(create: PostModel) {
     this.id = create.id;
     this.title = create.title;
     this.content = create.content;

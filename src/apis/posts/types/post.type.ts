@@ -1,6 +1,7 @@
 import { AggregateID } from '@libs/ddd/entity.base';
-import { Prisma, User } from '@prisma/client';
-import { ImageEntity } from '@src/apis/image/domain/images.entity';
+import { CommentEntity } from '@src/apis/comments/entities/comment.entity';
+import { ImageEntity } from '@src/apis/image/domain/image.entity';
+import { UserEntity } from '@src/apis/users/domain/users.entity';
 
 export interface PostProps {
   userId: AggregateID;
@@ -10,18 +11,18 @@ export interface PostProps {
   likeCount: number;
   commentCount: number;
 
-  user?: User;
+  user?: UserEntity;
   images?: ImageEntity[];
-  comments?: Comment[];
+  comments?: CommentEntity[];
 }
 
-const postWithAuthorAndImages = Prisma.validator<Prisma.PostDefaultArgs>()({
-  include: {
-    images: true,
-    user: true,
-  },
-});
+export interface CreatePostProps {
+  userId: AggregateID;
 
-export type PostWithAuthorAndImages = Prisma.PostGetPayload<
-  typeof postWithAuthorAndImages
->;
+  title: string;
+  content: string;
+
+  user?: UserEntity;
+  images?: ImageEntity[];
+  comments?: CommentEntity[];
+}

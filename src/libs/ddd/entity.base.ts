@@ -28,7 +28,7 @@ export abstract class Entity<EntityProps> {
     updatedAt,
     props,
   }: CreateEntityProps<EntityProps>) {
-    this.setId(id);
+    this._id = id;
     this.validateProps(props);
     const now = new Date();
     this._createdAt = createdAt || now;
@@ -45,7 +45,7 @@ export abstract class Entity<EntityProps> {
    * For example it could be a UUID for aggregate root,
    * and shortid / nanoid for child entities.
    */
-  protected abstract _id: AggregateID;
+  private readonly _id: AggregateID;
 
   private readonly _createdAt: Date;
 
@@ -53,10 +53,6 @@ export abstract class Entity<EntityProps> {
 
   get id(): AggregateID {
     return this._id;
-  }
-
-  private setId(id: AggregateID): void {
-    this._id = id;
   }
 
   get createdAt(): Date {

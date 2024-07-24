@@ -8,16 +8,12 @@ import { AggregateRoot } from '@src/libs/ddd/aggregate-root.base';
 import { Mapper } from '@src/libs/ddd/mapper.interface';
 import { RepositoryPort } from '@src/libs/ddd/repository.port';
 
-import { ZodObject } from 'zod';
-
 export abstract class BaseRepository<
   Aggregate extends AggregateRoot<any>,
-  DbModel extends ObjectLiteral & { id: bigint },
+  DbModel extends ObjectLiteral & { id: AggregateID },
 > implements RepositoryPort<Aggregate>
 {
-  protected abstract tableName: string;
-
-  protected abstract schema: ZodObject<any>;
+  // protected abstract schema: ZodObject<any>;
 
   protected constructor(
     protected readonly model: ExtendedModel<ModelNames>,
@@ -25,7 +21,7 @@ export abstract class BaseRepository<
     protected readonly eventBus: EventBus,
   ) {}
 
-  async findOneById(id: bigint): Promise<Aggregate> {
+  async findOneById(id: bigint): Promise<Aggregate | undefined> {
     const record = await this.model.findUnique({ where: { id } });
 
     return record ? this.mapper.toEntity(record) : undefined;
