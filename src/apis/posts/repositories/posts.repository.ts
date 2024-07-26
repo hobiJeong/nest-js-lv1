@@ -6,27 +6,35 @@ import { PostCountColumn } from '@src/apis/posts/const/post.enum';
 import { CustomPrismaClient } from 'src/prisma/types/type';
 import { getTsid } from 'tsid-ts';
 import { PostEntity } from '@src/apis/posts/domain/posts.entity';
-import { PostsModel } from '@src/apis/posts/entity/post.model';
+import { PostModel } from '@src/apis/posts/entity/post.model';
 import { CUSTOM_PRISMA_CLIENT } from '@src/prisma/prisma.module';
 import { EventBus } from '@nestjs/cqrs';
 import { ExtendedModel } from '@libs/types/model.type';
+import { PostMapper } from '@src/apis/posts/mappers/post.mapper';
 
 @Injectable()
-export class PostsRepository extends BaseRepository<PostEntity, PostsModel> {
+export class PostsRepository extends BaseRepository<PostEntity, PostModel> {
   constructor(
     @Inject(CUSTOM_PRISMA_CLIENT)
     private readonly client: CustomPrismaClient,
     private readonly eventBus: EventBus,
+    private readonly postMapper: PostMapper,
   ) {
     client.post;
 
     const postModel: ExtendedModel<'Post'> = client.post;
 
-    super(postModel, null, eventBus);
+    super(postModel, postMapper, eventBus);
   }
 
   async create(dto: CreatePostDto) {
-    this.client.post.createMany({ data: {} });
+    this.client.post.create({
+      data: {
+        user: {
+          c,
+        },
+      },
+    });
 
     return this.txHost.tx.post.create({
       data: {
