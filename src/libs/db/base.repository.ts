@@ -13,8 +13,6 @@ export abstract class BaseRepository<
   DbModel extends ObjectLiteral & { id: AggregateID },
 > implements RepositoryPort<Aggregate>
 {
-  // protected abstract schema: ZodObject<any>;
-
   protected constructor(
     protected readonly model: ExtendedModel<ModelNames>,
     protected readonly mapper: Mapper<Aggregate, DbModel>,

@@ -2,7 +2,33 @@ import { Mapper } from '@libs/ddd/mapper.interface';
 import { Injectable } from '@nestjs/common';
 import { PostEntity } from '@src/apis/posts/domain/posts.entity';
 import { PostResponseDto } from '@src/apis/posts/dto/responses/post.response-dto';
-import { PostModel } from '@src/apis/posts/entity/post.model';
+
+import { AggregateID } from '@libs/ddd/entity.base';
+import { ObjectLiteral } from '@libs/types/object-literal.type';
+import { BaseModel } from '@libs/db/base.model';
+
+export class PostModel extends BaseModel implements ObjectLiteral {
+  [key: string]: unknown;
+
+  readonly userId: AggregateID;
+
+  readonly title: string;
+  readonly content: string;
+  readonly likeCount: number;
+  readonly commentCount: number;
+
+  constructor(create: PostModel) {
+    super(create);
+
+    const { title, content, likeCount, commentCount, userId } = create;
+
+    this.title = title;
+    this.content = content;
+    this.likeCount = likeCount;
+    this.commentCount = commentCount;
+    this.userId = userId;
+  }
+}
 
 @Injectable()
 export class PostMapper
@@ -10,7 +36,6 @@ export class PostMapper
 {
   constructor(
     private readonly userMapper: UserMapper,
-    private readonly commentMapper: CommentMapper,
     private readonly imageMapper: ImageMapper,
   ) {}
 
@@ -27,9 +52,6 @@ export class PostMapper
         user: record.user ? this.userMapper.toEntity(record.user) : undefined,
         images: record.images
           ? this.imageMapper.toEntity(record.images)
-          : undefined,
-        comments: record.comments
-          ? this.commentMapper.toEntity(record.comments)
           : undefined,
       },
       createdAt: record.createdAt,

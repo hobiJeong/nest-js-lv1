@@ -6,16 +6,16 @@ import { PostProps } from '@src/apis/posts/types/post.type';
 import { UserEntity } from '@src/apis/users/domain/users.entity';
 
 export interface PostResponseDtoProps extends BaseResponseProps {
-  userId: AggregateID;
+  readonly userId: AggregateID;
 
-  title: string;
-  content: string;
-  commentCount: number;
-  likeCount: number;
+  readonly title: string;
+  readonly content: string;
+  readonly commentCount: number;
+  readonly likeCount: number;
 
-  comments?: CommentEntity[] | undefined;
-  images?: ImageEntity[] | undefined;
-  user?: UserEntity | undefined;
+  readonly comments?: CommentEntity[] | undefined;
+  readonly images?: ImageEntity[] | undefined;
+  readonly user?: UserEntity | undefined;
 }
 
 export class PostResponseDto extends BaseResponse implements PostProps {

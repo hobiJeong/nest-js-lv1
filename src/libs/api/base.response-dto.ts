@@ -18,13 +18,13 @@ export class BaseResponse extends IdResponseDto {
     example: '2020-11-24T17:43:15.970Z',
     description: '생성 일자',
   })
-  createdAt: string;
+  readonly createdAt: string;
 
   @ApiProperty({
     example: '2020-11-24T17:43:15.970Z',
     description: '수정 일자',
   })
-  updatedAt: string;
+  readonly updatedAt: string;
 
   constructor(props: BaseResponseProps) {
     super(props.id);

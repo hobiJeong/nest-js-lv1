@@ -89,22 +89,3 @@ export type ExtendedModel<T extends ModelNames> = DynamicModelExtensionThis<
     };
   }
 >;
-
-export type ChatRoomDelegate = ExtendedModel<'ChatRoom'>;
-export type CommentDelegate = ExtendedModel<'Comment'>;
-export type ImageDelegate = ExtendedModel<'Image'>;
-export type MessageDelegate = ExtendedModel<'Message'>;
-export type PostDelegate = ExtendedModel<'Post'>;
-export type FollowDelegate = ExtendedModel<'Follow'>;
-export type UserDelegate = ExtendedModel<'User'>;
-export type ChatUserDelegate = ExtendedModel<'ChatUser'>;
-
-export type ModelDelegate =
-  | ChatRoomDelegate
-  | CommentDelegate
-  | ImageDelegate
-  | MessageDelegate
-  | PostDelegate
-  | FollowDelegate
-  | UserDelegate
-  | ChatUserDelegate;
