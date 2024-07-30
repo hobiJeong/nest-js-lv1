@@ -1,16 +1,26 @@
 import { AggregateID } from '@libs/ddd/entity.base';
 import { ConflictException } from '@libs/exceptions/exceptions';
 import { ExtendedModel, ModelNames } from '@libs/types/model.type';
-import { ObjectLiteral } from '@libs/types/object-literal.type';
 import { EventBus } from '@nestjs/cqrs';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { AggregateRoot } from '@src/libs/ddd/aggregate-root.base';
 import { Mapper } from '@src/libs/ddd/mapper.interface';
 import { RepositoryPort } from '@src/libs/ddd/repository.port';
+import { z } from 'zod';
+
+export const baseSchema = z
+  .object({
+    id: z.bigint(),
+    createdAt: z.preprocess((val: any) => new Date(val), z.date()),
+    updatedAt: z.preprocess((val: any) => new Date(val), z.date()),
+  })
+  .strict();
+
+export type BaseModel = z.TypeOf<typeof baseSchema>;
 
 export abstract class BaseRepository<
   Aggregate extends AggregateRoot<any>,
-  DbModel extends ObjectLiteral & { id: AggregateID },
+  DbModel extends BaseModel,
 > implements RepositoryPort<Aggregate>
 {
   protected constructor(

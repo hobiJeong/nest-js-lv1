@@ -2,7 +2,7 @@ import { IdResponseDto } from '@libs/api/id.response-dto';
 import { AggregateID } from '@libs/ddd/entity.base';
 import { ApiProperty } from '@nestjs/swagger';
 
-export interface BaseResponseProps {
+export interface BaseResponseDtoProps {
   id: AggregateID;
   createdAt: Date;
   updatedAt: Date;
@@ -13,7 +13,7 @@ export interface BaseResponseProps {
  * id, createdAt and updatedAt so we can move them to a
  * separate class and extend it to avoid duplication.
  */
-export class BaseResponse extends IdResponseDto {
+export class BaseResponseDto extends IdResponseDto {
   @ApiProperty({
     example: '2020-11-24T17:43:15.970Z',
     description: '생성 일자',
@@ -26,7 +26,7 @@ export class BaseResponse extends IdResponseDto {
   })
   readonly updatedAt: string;
 
-  constructor(props: BaseResponseProps) {
+  constructor(props: BaseResponseDtoProps) {
     super(props.id);
     this.createdAt = new Date(props.createdAt).toISOString();
     this.updatedAt = new Date(props.updatedAt).toISOString();

@@ -8,7 +8,7 @@ import { CustomPrismaClient } from 'src/prisma/types/type';
  */
 
 export class AppRequestContext extends RequestContext {
-  requestId: string;
+  requestId!: string;
   transactionConnection?: TransactionHost<
     TransactionalAdapterPrisma<CustomPrismaClient>
   >; // For global transactions
