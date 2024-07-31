@@ -9,6 +9,7 @@ export interface PostProps {
   content: string;
   likeCount: number;
   commentCount: number;
+  deletedAt: Date | null;
 
   user?: UserEntity;
   images?: ImageEntity[];

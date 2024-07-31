@@ -13,6 +13,7 @@ export class PostEntity extends AggregateRoot<PostProps> {
       ...create,
       likeCount: 0,
       commentCount: 0,
+      deletedAt: null,
     };
 
     const post = new PostEntity({ id, props });

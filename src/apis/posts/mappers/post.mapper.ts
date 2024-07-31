@@ -1,34 +1,30 @@
 import { Mapper } from '@libs/ddd/mapper.interface';
 import { Injectable } from '@nestjs/common';
-import { PostEntity } from '@src/apis/posts/domain/posts.entity';
 import { PostResponseDto } from '@src/apis/posts/dto/responses/post.response-dto';
 
-import { AggregateID } from '@libs/ddd/entity.base';
-import { ObjectLiteral } from '@libs/types/object-literal.type';
-import { BaseModel } from '@libs/db/base.model';
+import { ImageMapper, imageSchema } from '@src/apis/image/mappers/image.mapper';
+import { UserMapper, userSchema } from '@src/apis/users/mappers/user.mapper';
+import { baseSchema } from '@libs/db/base.repository';
+import { z } from 'zod';
+import { PostEntity } from '@src/apis/posts/domain/post.entity';
 
-export class PostModel extends BaseModel implements ObjectLiteral {
-  [key: string]: unknown;
+export const postSchema = baseSchema.extend({
+  userId: z.bigint(),
 
-  readonly userId: AggregateID;
+  title: z.string().min(1).max(255),
+  content: z.string().min(1),
+  likeCount: z.number().int().nonnegative(),
+  commentCount: z.number().int().nonnegative(),
+  deletedAt: z.preprocess(
+    (val: any) => (val === null ? null : new Date(val)),
+    z.nullable(z.date()),
+  ),
 
-  readonly title: string;
-  readonly content: string;
-  readonly likeCount: number;
-  readonly commentCount: number;
+  images: z.array(imageSchema).optional(),
+  user: z.optional(userSchema),
+});
 
-  constructor(create: PostModel) {
-    super(create);
-
-    const { title, content, likeCount, commentCount, userId } = create;
-
-    this.title = title;
-    this.content = content;
-    this.likeCount = likeCount;
-    this.commentCount = commentCount;
-    this.userId = userId;
-  }
-}
+export type PostModel = z.TypeOf<typeof postSchema>;
 
 @Injectable()
 export class PostMapper
@@ -48,10 +44,11 @@ export class PostMapper
         content: record.content,
         commentCount: record.commentCount,
         likeCount: record.likeCount,
+        deletedAt: record.deletedAt,
 
         user: record.user ? this.userMapper.toEntity(record.user) : undefined,
-        images: record.images
-          ? this.imageMapper.toEntity(record.images)
+        images: record.images?.length
+          ? record.images.map((image) => this.imageMapper.toEntity(image))
           : undefined,
       },
       createdAt: record.createdAt,
@@ -62,14 +59,26 @@ export class PostMapper
   toPersistence(entity: PostEntity): PostModel {
     const props = entity.getProps();
 
-    return new PostModel({ ...props });
+    const record: PostModel = {
+      id: props.id,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+      deletedAt: props.deletedAt,
+
+      userId: props.userId,
+
+      title: props.title,
+      content: props.content,
+      likeCount: props.likeCount,
+      commentCount: props.commentCount,
+    };
+
+    return postSchema.parse(record);
   }
 
   toResponseDto(entity: PostEntity): PostResponseDto {
     const props = entity.getProps();
 
-    const dto = new PostResponseDto(props);
-
-    return dto;
+    return new PostResponseDto(props);
   }
 }

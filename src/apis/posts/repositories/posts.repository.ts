@@ -5,23 +5,24 @@ import { CreatePostDto } from '@src/apis/posts/dto/requests/create-post.dto';
 import { PostCountColumn } from '@src/apis/posts/const/post.enum';
 import { CustomPrismaClient } from 'src/prisma/types/type';
 import { getTsid } from 'tsid-ts';
-import { PostEntity } from '@src/apis/posts/domain/posts.entity';
-import { PostModel } from '@src/apis/posts/entity/post.model';
+import { PostEntity } from '@src/apis/posts/domain/post.entity';
 import { CUSTOM_PRISMA_CLIENT } from '@src/prisma/prisma.module';
 import { EventBus } from '@nestjs/cqrs';
 import { ExtendedModel } from '@libs/types/model.type';
-import { PostMapper } from '@src/apis/posts/mappers/post.mapper';
+import { PostMapper, PostModel } from '@src/apis/posts/mappers/post.mapper';
+import { PostsRepositoryPort } from '@src/apis/posts/repositories/posts.repository-port';
 
 @Injectable()
-export class PostsRepository extends BaseRepository<PostEntity, PostModel> {
+export class PostsRepository
+  extends BaseRepository<PostEntity, PostModel>
+  implements PostsRepositoryPort
+{
   constructor(
     @Inject(CUSTOM_PRISMA_CLIENT)
     private readonly client: CustomPrismaClient,
     private readonly eventBus: EventBus,
     private readonly postMapper: PostMapper,
   ) {
-    client.post;
-
     const postModel: ExtendedModel<'Post'> = client.post;
 
     super(postModel, postMapper, eventBus);
