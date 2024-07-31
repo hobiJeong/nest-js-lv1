@@ -1,31 +1,18 @@
-import { BaseModel } from '@libs/db/base.model';
-import { AggregateID } from '@libs/ddd/entity.base';
+import { baseSchema } from '@libs/db/base.repository';
 import { Mapper } from '@libs/ddd/mapper.interface';
-import { ObjectLiteral } from '@libs/types/object-literal.type';
-import { ImageType } from '@prisma/client';
 import { ImageEntity } from '@src/apis/image/domain/image.entity';
 import { ImageResponseDto } from '@src/apis/image/dto/response/image.response-dto';
+import { ImageType } from '@src/apis/image/types/image.type';
+import { z } from 'zod';
 
-export class ImageModel extends BaseModel implements ObjectLiteral {
-  [key: string]: unknown;
+export const imageSchema = baseSchema.extend({
+  postId: z.bigint(),
+  order: z.number().int().nonnegative(),
+  type: z.nativeEnum(ImageType),
+  path: z.string().min(1).max(255),
+});
 
-  readonly postId: AggregateID;
-
-  readonly order: number;
-  readonly type: ImageType;
-  readonly path: string;
-
-  constructor(create: ImageModel) {
-    super(create);
-
-    const { postId, order, type, path } = create;
-
-    this.postId = postId;
-    this.order = order;
-    this.type = type;
-    this.path = path;
-  }
-}
+export type ImageModel = z.TypeOf<typeof imageSchema>;
 
 export class ImageMapper
   implements Mapper<ImageEntity, ImageModel, ImageResponseDto>
@@ -33,12 +20,36 @@ export class ImageMapper
   toPersistence(entity: ImageEntity): ImageModel {
     const props = entity.getProps();
 
-    return new ImageModel(props);
+    const record: ImageModel = {
+      id: props.id,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+      postId: props.postId,
+      order: props.order,
+      type: props.type,
+      path: props.path,
+    };
+
+    return imageSchema.parse(record);
   }
 
   toEntity(record: ImageModel): ImageEntity {
-    return new ImageEntity({});
+    return new ImageEntity({
+      id: record.id,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      props: {
+        postId: record.postId,
+        order: record.order,
+        type: record.type,
+        path: record.path,
+      },
+    });
   }
 
-  toResponseDto(entity: ImageEntity): ImageResponseDto {}
+  toResponseDto(entity: ImageEntity): ImageResponseDto {
+    const props = entity.getProps();
+
+    return new ImageResponseDto(props);
+  }
 }
