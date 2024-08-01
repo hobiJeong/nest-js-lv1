@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@libs/ddd/aggregate-root.base';
+import { ImageType } from '@src/apis/image/const/image.const';
 import { ImageEntity } from '@src/apis/image/domain/image.entity';
-import { ImageType } from '@src/apis/image/types/image.type';
 import { PostCreatedDomainEvent } from '@src/apis/posts/domain/events/post-created.event';
 import { CreatePostProps, PostProps } from '@src/apis/posts/types/post.type';
 import { getTsid } from 'tsid-ts';

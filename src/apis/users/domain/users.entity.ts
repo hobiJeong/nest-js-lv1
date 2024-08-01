@@ -1,9 +1,12 @@
 import { AggregateRoot } from '@libs/ddd/aggregate-root.base';
-import { RolesEnum } from '@src/apis/users/const/roles.const';
 import { UserCreatedDomainEvent } from '@src/apis/users/domain/events/user-created.domain-event';
-import { CreateUserProps, UserProps } from '@src/apis/users/types/users.type';
 import { getTsid } from 'tsid-ts';
 import bcrypt from 'bcrypt';
+import {
+  UserProps,
+  CreateUserProps,
+} from '@src/apis/users/domain/users.entity-interface';
+import { UserRole } from '@src/apis/users/const/users.const';
 
 export class UserEntity extends AggregateRoot<UserProps> {
   static create(create: CreateUserProps) {
@@ -11,7 +14,7 @@ export class UserEntity extends AggregateRoot<UserProps> {
 
     const props: UserProps = {
       ...create,
-      role: RolesEnum.USER,
+      role: UserRole.USER,
       followeeCount: 0,
       followerCount: 0,
     };
