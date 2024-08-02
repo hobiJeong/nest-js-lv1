@@ -1,67 +1,51 @@
 import { BaseRepository } from '@libs/db/base.repository';
 import { Inject, Injectable } from '@nestjs/common';
-import { Post, Prisma } from '@prisma/client';
-import { CreatePostDto } from '@src/apis/posts/dto/requests/create-post.dto';
-import { PostCountColumn } from '@src/apis/posts/const/post.enum';
 import { CustomPrismaClient } from 'src/prisma/types/type';
-import { getTsid } from 'tsid-ts';
 import { PostEntity } from '@src/apis/posts/domain/post.entity';
 import { CUSTOM_PRISMA_CLIENT } from '@src/prisma/prisma.module';
 import { EventBus } from '@nestjs/cqrs';
 import { ExtendedModel } from '@libs/types/model.type';
 import { PostMapper, PostModel } from '@src/apis/posts/mappers/post.mapper';
 import { PostsRepositoryPort } from '@src/apis/posts/repositories/posts.repository-port';
+import { AggregateID } from '@libs/ddd/entity.base';
 
 @Injectable()
 export class PostsRepository
   extends BaseRepository<PostEntity, PostModel>
   implements PostsRepositoryPort
 {
+  private readonly postModel: ExtendedModel<'Post'>;
+
   constructor(
     @Inject(CUSTOM_PRISMA_CLIENT)
-    private readonly client: CustomPrismaClient,
-    private readonly eventBus: EventBus,
-    private readonly postMapper: PostMapper,
+    client: CustomPrismaClient,
+    eventBus: EventBus,
+    postMapper: PostMapper,
   ) {
     const postModel: ExtendedModel<'Post'> = client.post;
 
     super(postModel, postMapper, eventBus);
+    this.postModel = postModel;
   }
 
-  async create(dto: CreatePostDto) {
-    this.client.post.create({
-      data: {
-        user: {
-          c,
-        },
-      },
-    });
-
-    return this.txHost.tx.post.create({
-      data: {
-        id: getTsid().toBigInt(),
-        ...dto,
+  async findOneByIdWithUser(id: AggregateID): Promise<PostEntity | undefined> {
+    const post = await this.postModel.findUnique({
+      where: {
+        id,
       },
       include: {
         user: true,
       },
     });
+
+    return post ? this.mapper.toEntity(post) : undefined;
   }
 
-  findUniqueById(
-    id: number,
-    overrideOptions: Partial<Prisma.PostFindUniqueArgs> = {},
-  ) {
-    return this.txHost.tx.post.findUnique({
-      where: {
-        id,
-      },
-      ...overrideOptions,
-    });
-  }
-
-  findUniqueByIdWithAuthor(id: number, userId: number) {
-    return this.txHost.tx.post.findUnique({
+  async findOneByIdAndUserIdWithUser(
+    id: AggregateID,
+    userId: AggregateID,
+  ): Promise<PostEntity | undefined> {
+    const post = await this.postModel.findUnique({
       where: {
         id,
         userId,
@@ -70,50 +54,7 @@ export class PostsRepository
         user: true,
       },
     });
-  }
 
-  update(postEntity: Partial<Post> & Pick<Post, 'id'>) {
-    return this.txHost.tx.post.update({
-      data: {
-        ...postEntity,
-      },
-      where: {
-        id: postEntity.id,
-      },
-    });
-  }
-
-  delete(id: number) {
-    return this.txHost.tx.post.delete({
-      where: {
-        id,
-      },
-    });
-  }
-
-  increment(postId: number, countColumn: PostCountColumn) {
-    return this.txHost.tx.post.update({
-      where: {
-        id: postId,
-      },
-      data: {
-        [countColumn]: {
-          increment: 1,
-        },
-      },
-    });
-  }
-
-  decrement(postId: number, countColumn: PostCountColumn) {
-    return this.txHost.tx.post.update({
-      where: {
-        id: postId,
-      },
-      data: {
-        [countColumn]: {
-          decrement: 1,
-        },
-      },
-    });
+    return post ? this.mapper.toEntity(post) : undefined;
   }
 }
