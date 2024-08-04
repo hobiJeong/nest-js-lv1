@@ -4,8 +4,6 @@ import { CommonService } from 'src/common/common.service';
 import { PaginatePostDto } from '@src/apis/posts/dto/paginate-post.dto';
 import { UpdatePostDto } from '@src/apis/posts/dto/update-post.dto';
 
-import { $Enums, Post } from '@prisma/client';
-
 import { plainToInstance } from 'class-transformer';
 import type { PostWithAuthorAndImages } from '@src/apis/posts/type/post.type';
 import { PostImageModel } from 'src/common/entity/image.model';
@@ -14,10 +12,10 @@ import { PostsImagesService } from '@src/apis/posts/image/services/images.servic
 import { CreatePostAndImagesDto } from '@src/apis/posts/dto/create-post-and-images.dto';
 import { PostsRepository } from '@src/apis/posts/repositories/posts.repository';
 import { Transactional } from '@nestjs-cls/transactional';
-import { PostCountColumn } from '@src/apis/posts/const/post.enum';
 import { RequiredMethod } from 'src/common/guard/is-mine-or-admin.guard';
 import { CustomPrismaClient } from 'src/prisma/types/type';
 import { CUSTOM_PRISMA_CLIENT } from 'src/prisma/prisma.module';
+import { PostEntity } from '@src/apis/posts/domain/post.entity';
 
 @Injectable()
 export class PostsService implements RequiredMethod {
@@ -28,7 +26,7 @@ export class PostsService implements RequiredMethod {
     private readonly postsRepository: PostsRepository,
   ) {}
 
-  async generatePosts(userId: number) {
+  async generatePosts(userId: bigint) {
     for (let i = 0; i < 100; i++) {
       await this.createPost(userId, {
         title: `임의로 생성된 포스트 제목 ${i}`,
@@ -48,12 +46,8 @@ export class PostsService implements RequiredMethod {
     });
   }
 
-  async getPostById(id: number): Promise<Post> {
-    const post = await this.postsRepository.findUniqueById(id, {
-      include: {
-        author: true,
-      },
-    });
+  async getPostById(id: bigint): Promise<PostEntity> {
+    const post = await this.postsRepository.findOneByIdWithUser(id);
 
     if (!post) {
       throw new NotFoundException();
@@ -63,13 +57,17 @@ export class PostsService implements RequiredMethod {
   }
 
   @Transactional()
-  incrementCommentCount(postId: number) {
-    return this.postsRepository.increment(postId, PostCountColumn.CommentCount);
+  incrementCommentCount(entity: PostEntity) {
+    entity.incrementCommentCount();
+
+    return this.postsRepository.update(entity);
   }
 
   @Transactional()
-  decrementCommentCount(postId: number) {
-    return this.postsRepository.decrement(postId, PostCountColumn.LikeCount);
+  decrementCommentCount(entity: PostEntity) {
+    entity.decrementCommentCount;
+
+    return this.postsRepository.update(entity);
   }
 
   @Transactional()
@@ -106,7 +104,7 @@ export class PostsService implements RequiredMethod {
     return newPost as PostWithAuthorAndImages;
   }
 
-  async updatePost(postId: number, postDto: UpdatePostDto) {
+  async updatePost(postId: bigint, postDto: UpdatePostDto) {
     const { title, content } = postDto;
 
     const post = await this.postsRepository.findUniqueById(postId);
@@ -128,7 +126,7 @@ export class PostsService implements RequiredMethod {
     });
   }
 
-  async deletePost(postId: number) {
+  async deletePost(postId: bigint) {
     const post = await this.postsRepository.findUniqueById(postId);
 
     if (!post) {
@@ -140,16 +138,14 @@ export class PostsService implements RequiredMethod {
     return postId;
   }
 
-  checkPostExistsById(id: number): Promise<Post> {
-    return this.postsRepository.findUniqueById(id);
+  async checkPostExistsById(id: bigint): Promise<boolean> {
+    return !!(await this.postsRepository.findOneById(id));
   }
 
-  async isMine(userId: number, id: number): Promise<boolean> {
-    const posts = await this.postsRepository.findUniqueByIdWithAuthor(
+  async isMine(userId: bigint, id: bigint): Promise<boolean> {
+    return !!(await this.postsRepository.findOneByIdAndUserIdWithUser(
       id,
       userId,
-    );
-
-    return Boolean(posts);
+    ));
   }
 }

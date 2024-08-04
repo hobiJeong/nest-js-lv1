@@ -31,6 +31,26 @@ export class PostEntity extends AggregateRoot<PostProps> {
     return post;
   }
 
+  private updateCountColumn(
+    column: keyof Pick<PostProps, 'commentCount' | 'likeCount'>,
+    increment: boolean,
+  ) {
+    increment ? this.props[column]++ : this.props[column]--;
+  }
+
+  incrementLikeCount() {
+    this.updateCountColumn('likeCount', true);
+  }
+  decrementLikeCount() {
+    this.updateCountColumn('likeCount', false);
+  }
+  incrementCommentCount() {
+    this.updateCountColumn('commentCount', true);
+  }
+  decrementCommentCount() {
+    this.updateCountColumn('commentCount', false);
+  }
+
   appendImages(imagePaths: string[]) {
     const images = imagePaths.map((path, index) =>
       ImageEntity.create({
