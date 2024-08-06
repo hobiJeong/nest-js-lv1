@@ -46,11 +46,11 @@ export class PostsService implements RequiredMethod {
     });
   }
 
-  async getPostById(id: bigint): Promise<PostEntity> {
+  async findOneOrNotFound(id: bigint): Promise<PostEntity> {
     const post = await this.postsRepository.findOneByIdWithUser(id);
 
     if (!post) {
-      throw new NotFoundException();
+      throw new NotFoundException("The post doesn't exist");
     }
 
     return post;

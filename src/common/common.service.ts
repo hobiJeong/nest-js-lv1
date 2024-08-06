@@ -1,10 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
-import {
-  Paginator,
-  PaginatorOptions,
-} from 'prisma-extension-pagination/dist/extension';
+import { createPaginator } from 'prisma-extension-pagination';
 import { CursorPaginationMeta } from 'prisma-extension-pagination/dist/types';
 import {
   ENV_HOST_KEY,
@@ -21,6 +18,8 @@ import { BasePaginationDto } from 'src/common/dto/base-pagination.dto';
 import { CursorDto } from 'src/common/dto/cursor.dto';
 import { BaseModel } from 'src/common/entity/base.model';
 
+const paginate = createPaginator();
+
 @Injectable()
 export class CommonService {
   constructor(private readonly configService: ConfigService) {}
@@ -31,7 +30,7 @@ export class CommonService {
     A extends FindManyAggregates,
   >(
     dto: T,
-    prismaModel: { paginate: Paginator<PaginatorOptions> },
+    prismaModel: { paginate: typeof paginate },
     path: string,
     overrideOptions?: FindManyArgs<A, M>,
   ) {
