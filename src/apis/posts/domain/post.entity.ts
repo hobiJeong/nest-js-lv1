@@ -12,11 +12,21 @@ export class PostEntity extends AggregateRoot<PostProps> {
   static create(create: CreatePostProps): PostEntity {
     const id = getTsid().toBigInt();
 
+    const { imagePaths, ...createProps } = create;
+
     const props: PostProps = {
-      ...create,
+      ...createProps,
       likeCount: 0,
       commentCount: 0,
       deletedAt: null,
+      images: imagePaths.map((path, index) =>
+        ImageEntity.create({
+          postId: this.id,
+          order: index,
+          type: ImageType.POST_IMAGE,
+          path,
+        }),
+      )
     };
 
     const post = new PostEntity({ id, props });
@@ -51,7 +61,7 @@ export class PostEntity extends AggregateRoot<PostProps> {
     this.updateCountColumn('commentCount', false);
   }
 
-  appendImages(imagePaths: string[]) {
+  private appendImages(imagePaths: string[] | []) {
     const images = imagePaths.map((path, index) =>
       ImageEntity.create({
         postId: this.id,
@@ -64,7 +74,7 @@ export class PostEntity extends AggregateRoot<PostProps> {
     this.setImages(images);
   }
 
-  private setImages(images: ImageEntity[]) {
+  private setImages(images: ImageEntity[] | []) {
     this.props.images = images;
   }
 
