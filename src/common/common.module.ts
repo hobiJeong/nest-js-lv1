@@ -6,8 +6,8 @@ import * as multer from 'multer';
 import { extname } from 'path';
 import { TEMP_FOLDER_PATH } from 'src/common/const/path.const';
 import { v4 as uuid } from 'uuid';
-import { AuthModule } from '@src/apis/auth/auth.module';
-import { UsersModule } from '@src/apis/users/users.module';
+import { AuthModule } from '@modules/auth/auth.module';
+import { UsersModule } from '@modules/users/users.module';
 
 @Module({
   imports: [

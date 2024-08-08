@@ -12,7 +12,7 @@ import { Reflector } from '@nestjs/core';
 import { isNumberString } from 'class-validator';
 import { Request } from 'express';
 import { RolesEnum } from '@src/apis/users/const/roles.const';
-import { UsersModel } from '@src/apis/users/entity/users.entity';
+import { UsersModel } from '@modules/users/entity/users.entity';
 
 export interface RequiredMethod {
   isMine: (userId: number, id: number) => Promise<boolean>;

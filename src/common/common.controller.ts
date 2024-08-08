@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CommonService } from './common.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AccessTokenGuard } from '@src/apis/auth/guard/bearer-token.guard';
+import { AccessTokenGuard } from '@modules/auth/guard/bearer-token.guard';
 
 @Controller('common')
 export class CommonController {
