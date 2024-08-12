@@ -18,7 +18,7 @@ export class PrismaClientExtended
   implements OnModuleInit, OnModuleDestroy
 {
   private readonly logger = new Logger(PrismaClientExtended.name);
-  private customPrismaClient: CustomPrismaClient;
+  private customPrismaClient!: CustomPrismaClient;
 
   constructor() {
     super({
