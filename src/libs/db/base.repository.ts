@@ -72,7 +72,19 @@ export abstract class BaseRepository<
 
         throw new ConflictException('Record already exists', error);
       }
+
       throw error;
     }
+  }
+
+  async update(entity: Aggregate) {
+    const record = this.mapper.toPersistence(entity);
+
+    const updatedRecord = this.model.update({
+      where: { id: record.id },
+      data: { ...record },
+    });
+
+    return this.mapper.toEntity(updatedRecord);
   }
 }
