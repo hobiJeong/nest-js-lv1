@@ -12,7 +12,7 @@ export class CreatePostHandler implements ICommandHandler<CreatePostCommand> {
     execute(command: CreatePostCommand): Promise<any> {
         const { title, content, userId, images } = command;
 
-        const entity = UserEntity.create();
+        const entity = UserEntity.create({title, content, userId});
     }
 }
 
