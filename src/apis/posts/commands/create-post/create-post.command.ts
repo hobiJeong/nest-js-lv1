@@ -5,7 +5,7 @@ export class CreatePostCommand extends Command implements ICommand {
   readonly title: string;
   readonly content: string;
   readonly userId: bigint;
-  readonly images?: string;
+  readonly images?: string[];
 
   constructor(props: CommandProps<CreatePostCommand>) {
     super(props);
