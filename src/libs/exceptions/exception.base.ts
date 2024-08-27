@@ -1,7 +1,9 @@
+import { HTTP_ERROR_STATUS_CODES } from '@libs/types/http-status-code.enum';
 import { RequestContextService } from '@src/libs/application/context/app-request.context';
 
 export interface SerializedException {
   message: string;
+  statusCode: HTTP_ERROR_STATUS_CODES;
   code: string;
   correlationId: string;
   stack?: string;
@@ -25,6 +27,7 @@ export interface SerializedException {
  */
 export abstract class ExceptionBase extends Error {
   abstract code: string;
+  abstract statusCode: HTTP_ERROR_STATUS_CODES;
 
   public readonly correlationId: string;
 
@@ -57,6 +60,7 @@ export abstract class ExceptionBase extends Error {
   toJSON(): SerializedException {
     return {
       message: this.message,
+      statusCode: this.statusCode,
       code: this.code,
       stack: this.stack,
       correlationId: this.correlationId,

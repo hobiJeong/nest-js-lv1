@@ -7,6 +7,7 @@ import {
   NOT_FOUND,
 } from '@src/libs/exceptions/exception.codes';
 import { ExceptionBase } from './exception.base';
+import { HTTP_ERROR_STATUS_CODES } from '@libs/types/http-status-code.enum';
 
 /**
  * Used to indicate that an incorrect argument was provided to a method/function/class constructor
@@ -16,6 +17,7 @@ import { ExceptionBase } from './exception.base';
  */
 export class ArgumentInvalidException extends ExceptionBase {
   readonly code = ARGUMENT_INVALID;
+  readonly statusCode = HTTP_ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
 }
 
 /**
@@ -26,6 +28,7 @@ export class ArgumentInvalidException extends ExceptionBase {
  */
 export class ArgumentNotProvidedException extends ExceptionBase {
   readonly code = ARGUMENT_NOT_PROVIDED;
+  readonly statusCode = HTTP_ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
 }
 
 /**
@@ -37,6 +40,7 @@ export class ArgumentNotProvidedException extends ExceptionBase {
  */
 export class ArgumentOutOfRangeException extends ExceptionBase {
   readonly code = ARGUMENT_OUT_OF_RANGE;
+  readonly statusCode = HTTP_ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
 }
 
 /**
@@ -47,6 +51,7 @@ export class ArgumentOutOfRangeException extends ExceptionBase {
  */
 export class ConflictException extends ExceptionBase {
   readonly code = CONFLICT;
+  readonly statusCode = HTTP_ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
 }
 
 /**
@@ -57,6 +62,7 @@ export class ConflictException extends ExceptionBase {
  */
 export class NotFoundException extends ExceptionBase {
   static readonly message = 'Not found';
+  readonly statusCode = HTTP_ERROR_STATUS_CODES.NOT_FOUND;
 
   constructor(message = NotFoundException.message) {
     super(message);
@@ -73,6 +79,7 @@ export class NotFoundException extends ExceptionBase {
  */
 export class InternalServerErrorException extends ExceptionBase {
   static readonly message = 'Internal server error';
+  readonly statusCode = HTTP_ERROR_STATUS_CODES.INTERNAL_SERVER_ERROR;
 
   constructor(message = InternalServerErrorException.message) {
     super(message);
