@@ -1,7 +1,7 @@
 import { RequestContextService } from '@src/libs/application/context/app-request.context';
 import { ArgumentNotProvidedException } from '@src/libs/exceptions/exceptions';
 import { Guard } from '../guard';
-import { randomUUID } from 'crypto';
+import { getTsid } from 'tsid-ts';
 
 export type CommandProps<T> = Omit<T, 'id' | 'metadata'> & Partial<Command>;
 
@@ -32,7 +32,7 @@ export class Command {
    * Command id, in case if we want to save it
    * for auditing purposes and create a correlation/causation chain
    */
-  readonly id: string;
+  readonly id: bigint;
 
   readonly metadata: CommandMetadata;
 
@@ -43,7 +43,7 @@ export class Command {
       );
     }
     const ctx = RequestContextService.getContext();
-    this.id = props.id || randomUUID();
+    this.id = props.id || getTsid().toBigInt();
     this.metadata = {
       correlationId: props?.metadata?.correlationId || ctx.requestId,
       causationId: props?.metadata?.causationId,
