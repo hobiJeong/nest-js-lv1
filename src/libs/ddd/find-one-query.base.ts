@@ -1,7 +1,8 @@
 import { ArgumentNotProvidedException } from '@libs/exceptions/exceptions';
 import { Guard } from '@libs/guard';
+import { IQuery } from '@nestjs/cqrs';
 
-export class FindOneQuery {
+export class FindOneQuery implements IQuery {
   /**
    * @description FindOneQuery 기본 필드
    */
