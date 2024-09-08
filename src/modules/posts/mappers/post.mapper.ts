@@ -1,12 +1,11 @@
 import { Mapper } from '@libs/ddd/mapper.interface';
 import { Injectable } from '@nestjs/common';
 import { PostResponseDto } from '@modules/posts/dto/responses/post.response-dto';
-
-import { ImageMapper, imageSchema } from '@src/apis/image/mappers/image.mapper';
 import { UserMapper, userSchema } from '@modules/users/mappers/user.mapper';
 import { baseSchema } from '@libs/db/base.repository';
 import { z } from 'zod';
 import { PostEntity } from '@modules/posts/domain/post.entity';
+import { ImageMapper, imageSchema } from '@modules/images/mappers/image.mapper';
 
 export const postSchema = baseSchema.extend({
   userId: z.bigint(),
@@ -46,10 +45,10 @@ export class PostMapper
         likeCount: record.likeCount,
         deletedAt: record.deletedAt,
 
-        user: record.user ? this.userMapper.toEntity(record.user) : undefined,
+        user: record.user ? this.userMapper.toEntity(record.user) : null,
         images: record.images?.length
           ? record.images.map((image) => this.imageMapper.toEntity(image))
-          : undefined,
+          : [],
       },
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,

@@ -3,8 +3,8 @@ import {
   BaseResponseDtoProps,
 } from '@libs/api/base.response-dto';
 import { AggregateID } from '@libs/ddd/entity.base';
-import { ImageEntity } from '@src/apis/image/domain/image.entity';
-import { PostProps } from '@src/apis/posts/types/post.type';
+import { ImageEntity } from '@modules/images/domain/image.entity';
+import { PostProps } from '@modules/posts/domain/post.entity-interface';
 import { UserEntity } from '@modules/users/domain/users.entity';
 
 export interface PostResponseDtoProps extends BaseResponseDtoProps {
@@ -15,11 +15,14 @@ export interface PostResponseDtoProps extends BaseResponseDtoProps {
   readonly commentCount: number;
   readonly likeCount: number;
 
-  readonly images?: ImageEntity[];
-  readonly user?: UserEntity;
+  readonly images: ImageEntity[] | [];
+  readonly user: UserEntity | null;
 }
 
-export class PostResponseDto extends BaseResponseDto implements PostProps {
+export class PostResponseDto
+  extends BaseResponseDto
+  implements Omit<PostProps, 'deletedAt'>
+{
   readonly userId: AggregateID;
 
   readonly title: string;
@@ -27,8 +30,8 @@ export class PostResponseDto extends BaseResponseDto implements PostProps {
   readonly commentCount: number;
   readonly likeCount: number;
 
-  readonly images?: ImageEntity[];
-  readonly user?: UserEntity;
+  readonly images: ImageEntity[] | [];
+  readonly user: UserEntity | null;
 
   constructor(create: PostResponseDtoProps) {
     super(create);
@@ -42,7 +45,7 @@ export class PostResponseDto extends BaseResponseDto implements PostProps {
     this.commentCount = commentCount;
     this.likeCount = likeCount;
 
-    this.images = images ? images : undefined;
-    this.user = user ? user : undefined;
+    this.images = images?.length ? images : [];
+    this.user = user ? user : null;
   }
 }

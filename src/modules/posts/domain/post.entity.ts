@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@libs/ddd/aggregate-root.base';
-import { ImageType } from '@src/apis/image/const/image.const';
-import { ImageEntity } from '@src/apis/image/domain/image.entity';
+import { ImageType } from '@modules/images/const/image.const';
+import { ImageEntity } from '@modules/images/domain/image.entity';
 import { PostCreatedDomainEvent } from '@modules/posts/domain/events/post-created.event';
 import {
   PostProps,
@@ -21,7 +21,7 @@ export class PostEntity extends AggregateRoot<PostProps> {
       deletedAt: null,
       images: imagePaths.map((path, index) =>
         ImageEntity.create({
-          postId: this.id,
+          postId: id,
           order: index,
           type: ImageType.POST_IMAGE,
           path,

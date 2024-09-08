@@ -28,20 +28,17 @@ export class PostsRepository
     this.postModel = postModel;
   }
 
-  async findOneByIdWithUser(id: AggregateID): Promise<PostEntity | undefined> {
+  async findOneById(id: AggregateID): Promise<PostEntity | undefined> {
     const post = await this.postModel.findUnique({
       where: {
         id,
-      },
-      include: {
-        user: true,
       },
     });
 
     return post ? this.mapper.toEntity(post) : undefined;
   }
 
-  async findOneByIdAndUserIdWithUser(
+  async findOneByIdAndUserId(
     id: AggregateID,
     userId: AggregateID,
   ): Promise<PostEntity | undefined> {
@@ -49,9 +46,6 @@ export class PostsRepository
       where: {
         id,
         userId,
-      },
-      include: {
-        user: true,
       },
     });
 
