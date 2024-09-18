@@ -19,6 +19,7 @@ export class PostEntity extends AggregateRoot<PostProps> {
       likeCount: 0,
       commentCount: 0,
       deletedAt: null,
+      user: null,
       images: imagePaths.map((path, index) =>
         ImageEntity.create({
           postId: id,

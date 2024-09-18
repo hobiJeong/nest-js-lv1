@@ -28,16 +28,6 @@ export class PostsRepository
     this.postModel = postModel;
   }
 
-  async findOneById(id: AggregateID): Promise<PostEntity | undefined> {
-    const post = await this.postModel.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    return post ? this.mapper.toEntity(post) : undefined;
-  }
-
   async findOneByIdAndUserId(
     id: AggregateID,
     userId: AggregateID,

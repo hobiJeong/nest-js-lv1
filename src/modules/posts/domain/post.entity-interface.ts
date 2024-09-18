@@ -11,8 +11,8 @@ export interface PostProps {
   commentCount: number;
   deletedAt: Date | null;
 
-  user?: UserEntity | null;
-  images?: ImageEntity[] | [];
+  user: UserEntity | null;
+  images: ImageEntity[] | [];
 }
 
 export interface CreatePostProps {

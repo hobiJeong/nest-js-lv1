@@ -45,7 +45,7 @@ export class PostResponseDto
     this.commentCount = commentCount;
     this.likeCount = likeCount;
 
-    this.images = images?.length ? images : [];
+    this.images = images.length ? images : [];
     this.user = user ? user : null;
   }
 }

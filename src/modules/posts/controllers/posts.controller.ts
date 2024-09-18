@@ -28,6 +28,7 @@ import {
 import { Transactional } from '@nestjs-cls/transactional';
 import { PostsService } from '@modules/posts/services/posts.service';
 import { CreatePostAndImagesDto } from '@modules/posts/dto/create-post-and-images.dto';
+import { CommandBus } from '@nestjs/cqrs';
 
 /**
  * author: string;
@@ -39,7 +40,10 @@ import { CreatePostAndImagesDto } from '@modules/posts/dto/create-post-and-image
 
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   // 1) GET /posts
   //     모든 post를 다 가져온다
